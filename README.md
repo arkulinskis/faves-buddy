@@ -7,7 +7,7 @@ open data, and lists can be shared with a link or with people. A Chrome extensio
 [Anvil](https://anvil.works).
 
 - **App repo:** github.com/arkulinskis/faves-buddy (branch `master`). Anvil pulls `master`.
-- **Live:** not published yet (planned `favesbuddy.anvil.app` until a domain is chosen).
+- **Live:** https://faves-buddy.anvil.app
 
 ## What it does
 
