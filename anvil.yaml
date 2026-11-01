@@ -547,7 +547,7 @@ metadata:
   title: 'Faves Buddy: save tabs, map pins and screenshots, sorted'
 name: Faves Buddy
 native_deps:
-  head_html: "<script src=\"_/theme/legal-kit.js?v=52942c6e70\"></script>\n<!-- seo:start (APP_MAKER/seo: edit seo/apps/favesbuddy.json\
+  head_html: "<script src=\"_/theme/legal-kit.js?v=5b6048d237\"></script>\n<!-- seo:start (APP_MAKER/seo: edit seo/apps/favesbuddy.json\
     \ and run seo.py, not here) -->\n<link rel=\"canonical\" href=\"https://faves-buddy.anvil.app/\">\n<meta name=\"robots\"\
     \ content=\"index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1\">\n<meta name=\"keywords\" content=\"\
     save open tabs, bookmark manager, save Google Maps pins, screenshot organizer, read later app, tab manager Chrome extension,\
