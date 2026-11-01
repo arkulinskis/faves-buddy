@@ -470,10 +470,13 @@ def share(**kw):
     note = ""
     if not links and not files and (text or title):
         note = "\n".join(x for x in (title, text) if x)
+    base = _app_origin() if _app_origin().startswith("https://") else ""
+    got = "links=%d; files=%d; note=%d" % (len(links), len(files), 1 if note else 0)
     if not (links or files or note):
-        return anvil.server.HttpResponse(303, "", headers={"Location": "/#tidy"})
+        return anvil.server.HttpResponse(303, "", headers={"Location": base + "/#tidy", "X-Faves-Received": got})
     code = new_drop(links=links, files=files, note=note, title=title, name=title if len(links) > 1 else None)
-    return anvil.server.HttpResponse(303, "", headers={"Location": "/#share/" + code, "Cache-Control": "no-store"})
+    return anvil.server.HttpResponse(303, "", headers={"Location": base + "/#share/" + code, "Cache-Control": "no-store",
+                                                       "X-Faves-Received": got})
 
 
 @anvil.server.http_endpoint("/manifest.json")
