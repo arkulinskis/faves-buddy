@@ -7,7 +7,7 @@ read them. Rotating the token (Tools) disconnects every browser that had the old
 
 Actions: ping | save (one tab, with what the extension read from the page) | save_many (a window's tabs,
 as a tab set) | note (selected text) | set_category (re-file what was just saved; keeps it and teaches the sorter)
-| tabsets | tabset_urls (to reopen a set).
+| tabsets | tabset_urls (to reopen a set) | drop_links (tabs open on another device, to sort in the app).
 """
 import base64
 import json
@@ -19,6 +19,7 @@ import anvil.tables as tables
 from . import common as C
 from . import Store
 from . import Taxonomy as T
+from . import Tidy
 
 MAX_TABS = 150
 
@@ -147,6 +148,15 @@ def _do(me, action, d):
         if ts is None or ts["owner"] != me:
             return {"ok": False, "error": "That tab set isn't there any more."}
         return {"ok": True, "urls": [r["url"] for r in app_tables.faves.search(tabset=ts) if r["url"]][:MAX_TABS]}
+    if action == "drop_links":
+        # Tabs open on another device (the popup's "Tabs on your other devices"): parked for the app's tab sorter,
+        # which the extension then opens at #share/<code>.
+        items = [{"url": C.text(i.get("url"), 1000), "title": C.text(i.get("title"), 200)}
+                 for i in (d.get("items") or []) if isinstance(i, dict) and str(i.get("url") or "").startswith("http")][:Tidy.MAX_LINKS]
+        if not items:
+            return {"ok": False, "error": "No tabs to sort."}
+        code = Tidy.new_drop(links=items, name=C.text(d.get("group"), 80) or "Tabs from another device", claimed_by=me.get_id())
+        return {"ok": True, "code": code, "count": len(items)}
     return {"ok": False, "error": "Unknown request."}
 
 

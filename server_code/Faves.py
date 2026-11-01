@@ -8,6 +8,7 @@ from anvil.tables import app_tables
 import anvil.tables as tables
 
 from . import common as C
+from . import AISort
 from . import Classify
 from . import DemoData
 from . import Fetch
@@ -39,7 +40,16 @@ def fb_boot():
     me = C.require_user()
     Store.claim_invites(me)
     p = Store.prefs_for(me)
-    return {"cats": T.public(), "home": p["home"], "settings": p["settings"] or {}, "api": Store.api_origin()}
+    return {"cats": T.public(), "home": p["home"], "settings": public_settings(p), "api": Store.api_origin(),
+            "ai": AISort.state_for(me)}
+
+
+PRIVATE_SETTINGS = ("shots_seen", "drops", "ai_day", "ai_n")
+
+
+def public_settings(p):
+    """The person's settings without the bookkeeping (screenshot fingerprints, open shares, AI usage)."""
+    return {k: v for k, v in (p["settings"] or {}).items() if k not in PRIVATE_SETTINGS}
 
 
 # ------------------------------------------------------------------------------------------- library
@@ -583,11 +593,11 @@ def set_prefs(home=None, settings=None):
             p["home"] = {"lat": lat, "lng": lng, "label": C.text(home.get("label"), 80) or "Home base"}
     if isinstance(settings, dict):
         s = dict(p["settings"] or {})
-        for k in ("radius_km", "units", "auto_keep", "events_classes"):
+        for k in ("radius_km", "units", "auto_keep", "events_classes", "ai_sort"):
             if k in settings:
                 s[k] = settings[k] if not isinstance(settings[k], str) else C.text(settings[k], 60)
         p["settings"] = s
-    return C.ok(home=p["home"], settings=p["settings"] or {})
+    return C.ok(home=p["home"], settings=public_settings(p))
 
 
 @anvil.server.callable(require_user=True)

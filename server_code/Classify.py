@@ -171,7 +171,8 @@ def classify(info, model=None):
     if kind in ("note", "idea") and not dom:
         add("ideas", 1.0 if kind == "note" else 3.0, "it's a note" if kind == "note" else "you called it an idea")
     if kind == "event" or info.get("when"):
-        add("events", 3.5, "it has a date")
+        # a picture with a date and a time on it is usually a poster, a ticket or an invite
+        add("events", 4.5 if kind == "photo" else 3.5, "it has a date")
     elif when_mentioned(title + " " + body):
         add("events", 2.5, "it mentions a date and time")
 

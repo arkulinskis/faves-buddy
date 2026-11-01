@@ -423,6 +423,7 @@
     return '<div class="ui-menu" data-menu hidden>' +
       '<div class="ui-menu-head"><strong>' + esc(me.name) + '</strong><span class="muted small">' + esc(me.email) + '</span></div>' +
       '<a href="#lists" data-go="lists">' + UI.icon('grid') + 'Your lists</a>' +
+      '<a href="#tidy" data-go="tidy">' + UI.icon('wand') + 'Tidy tabs &amp; screenshots</a>' +
       '<a href="#tabs" data-go="tabs">' + UI.icon('tabs') + 'Saved tab sets</a>' +
       '<a href="#tools" data-go="tools">' + UI.icon('puzzle') + 'Extension, import &amp; tools</a>' +
       '<a href="#profile" data-go="profile">' + UI.icon('user') + 'Your profile</a>' +
@@ -510,6 +511,7 @@
       bootP = UI.apiQuiet('fb_boot').then(function (b) {
         FB.setCats(b.cats);
         FB.prefs = { home: b.home, settings: b.settings || {} }; FB.API = b.api || '';
+        FB.aiSort = b.ai || { available: false, on: false };   // AI second opinion for sorting (in progress, AISort.py)
         return b;
       }, function (e) { bootP = null; throw e; });
     }
@@ -1201,6 +1203,7 @@
 
     function frame(inner) {
       view.innerHTML = '<div class="ui-wrap ad-box"><div class="ui-page-head"><div><h1>Save something</h1><p class="muted">It\'s sorted for you. You can always change where it goes.</p></div></div>' +
+        '<div class="ad-tidy"><a class="ui-btn sm" href="#tidy/tabs" data-go="tidy/tabs">' + UI.icon('tabs') + 'A pile of tabs</a><a class="ui-btn sm" href="#tidy/shots" data-go="tidy/shots">' + UI.icon('wand') + 'Sweep screenshots</a></div>' +
         '<nav class="ui-tabs ad-tabs">' + TABS.map(function (t) { return '<a href="#add/' + t[0] + '" class="' + (t[0] === tab ? 'on' : '') + '">' + UI.icon(t[2]) + t[1] + '</a>'; }).join('') + '</nav>' +
         '<div data-body>' + inner + '</div></div>';
     }
@@ -1392,7 +1395,7 @@
 /* ===== admin.html ===== */
 (function () {
   var esc = UI.esc;
-  var TABS = [['overview', 'Overview', 'grid'], ['feedback', 'Feedback', 'inbox'], ['users', 'Users', 'users'], ['sorting', 'Sorting', 'sparkle'], ['demo', 'Demo data', 'database']];
+  var TABS = [['overview', 'Overview', 'grid'], ['feedback', 'Feedback', 'inbox'], ['users', 'Users', 'users'], ['sorting', 'Sorting', 'sparkle'], ['ai', 'AI sorting', 'wand'], ['demo', 'Demo data', 'database']];
 
   UI.page('admin', { title: 'Admin', auth: 'admin' }, function (view, ctx) {
     var tab = TABS.some(function (t) { return t[0] === ctx.args[0]; }) ? ctx.args[0] : 'overview';
@@ -1474,7 +1477,25 @@
       });
     }
 
-    var DRAW = { overview: overview, feedback: feedback, users: users, sorting: sorting, demo: demo };
+    function ai() {
+      return UI.api('admin_ai_status').then(function (d) {
+        var c = d.config;
+        body.innerHTML = '<div class="ui-card"><div class="ui-row" style="justify-content:space-between"><h3 style="margin:0">AI second opinion for sorting</h3><span class="ui-badge brand">In progress</span></div>' +
+          '<p class="muted">The rules sort everything first, without AI. When this is on, people who opt in (Tools → AI) get Claude’s suggestion on the inbox items the rules aren’t sure about. It only suggests; nothing is re-filed by itself. ' +
+          'Sent per item: title, website, link path, up to 300 characters of text. Never pictures.</p>' +
+          '<div class="ui-grid two" style="margin-top:14px"><div><p><b>1. Key:</b> ' + (d.has_key ? '<span class="ui-badge brand">' + UI.icon('check') + ' found in App Secrets</span>'
+            : 'not added yet. In the Anvil editor, open <b>App Secrets</b> and add a secret named <code>' + esc(d.secret) + '</code> holding your Anthropic API key.') + '</p>' +
+          '<p><b>2. Switch:</b> ' + (d.available ? 'on' : 'off') + ' · <b>' + d.opted_in + '</b> people opted in · ' + d.suggestions_waiting + ' suggestions in inboxes</p></div>' +
+          '<form class="ui-stack" data-aiset><label class="ui-check"><input type="checkbox" name="enabled"' + (c.enabled ? ' checked' : '') + (d.has_key ? '' : ' disabled') + '> Turn it on for everyone who opts in</label>' +
+          '<label class="ui-field"><span>Model</span><select name="model">' + d.models.map(function (m) { return '<option value="' + m[0] + '"' + (m[0] === c.model ? ' selected' : '') + '>' + esc(m[1] + ': ' + m[2]) + '</option>'; }).join('') + '</select></label>' +
+          '<div class="ui-row"><label class="ui-field" style="flex:1"><span>Ask when the rules are under (confidence)</span><input type="number" name="threshold" min="0.2" max="0.95" step="0.05" value="' + c.threshold + '"></label>' +
+          '<label class="ui-field" style="flex:1"><span>Items per person per day</span><input type="number" name="daily" min="10" max="2000" step="10" value="' + c.daily + '"></label></div>' +
+          '<div class="ui-row"><button class="ui-btn primary" type="submit">Save</button><button class="ui-btn" type="button" data-aitest' + (d.has_key ? '' : ' disabled') + '>' + UI.icon('play') + 'Test on my least-sure faves</button></div></form></div>' +
+          '<div data-aiout style="margin-top:14px"></div></div>';
+      });
+    }
+
+    var DRAW = { overview: overview, feedback: feedback, users: users, sorting: sorting, ai: ai, demo: demo };
 
     view.addEventListener('click', function (e) {
       var f = e.target.closest('[data-filter]');
@@ -1489,6 +1510,17 @@
       if (del) {
         UI.confirm({ title: 'Delete this message?', ok: 'Delete', danger: true }).then(function (yes) {
           if (yes) UI.api('delete_feedback', del.closest('[data-id]').getAttribute('data-id')).then(feedback);
+        });
+        return;
+      }
+      var at = e.target.closest('[data-aitest]');
+      if (at) {
+        var model = view.querySelector('[data-aiset] [name=model]').value;
+        UI.busy(at, UI.api('admin_ai_test', model)).then(function (r) {
+          view.querySelector('[data-aiout]').innerHTML = '<p class="small muted">' + esc(r.model) + ' · ' + r.ms + ' ms' + (r.usage.input_tokens ? ' · ' + r.usage.input_tokens + ' tokens in, ' + r.usage.output_tokens + ' out' : '') + '</p>' +
+            '<table class="ad-users"><thead><tr><th>Fave</th><th>Rules</th><th>AI</th><th>Why</th></tr></thead><tbody>' + r.rows.map(function (x) {
+              return '<tr><td>' + esc(x.title) + '</td><td>' + esc(x.rules) + ' (' + Math.round(x.rules_conf * 100) + '%)</td><td><b>' + esc(x.ai || '-') + '</b> ' + esc(x.sure || '') + '</td><td class="small">' + esc(x.why || '') + '</td></tr>';
+            }).join('') + '</tbody></table>';
         });
         return;
       }
@@ -1508,6 +1540,11 @@
     });
     view.addEventListener('submit', function (e) {
       if (e.target.matches('[data-search]')) { e.preventDefault(); users(UI.formData(e.target).q); }
+      if (e.target.matches('[data-aiset]')) {
+        e.preventDefault();
+        var v = UI.formData(e.target);
+        UI.busy(e.target.querySelector('[type=submit]'), UI.api('admin_ai_save', { enabled: !!v.enabled, model: v.model, threshold: v.threshold, daily: v.daily })).then(function () { UI.toast('Saved', 'ok'); ai(); });
+      }
       if (e.target.matches('[data-try]')) {
         e.preventDefault();
         var v = UI.formData(e.target);
@@ -1996,7 +2033,8 @@
         '<div class="hm-ways">' +
         '<div class="hm-way">' + UI.icon('puzzle') + '<div><b>Save tabs from Chrome</b><div class="muted small">One click for this tab, or the whole window at once. <a href="#tools" data-go="tools">Get the extension</a></div></div></div>' +
         '<div class="hm-way">' + UI.icon('pin') + '<div><b>Paste a Google Maps link</b><div class="muted small">It becomes a pin on your map, with the place\'s type and hours.</div></div></div>' +
-        '<div class="hm-way">' + UI.icon('image') + '<div><b>Drop in screenshots</b><div class="muted small">The text in them is read on your device, so a poster becomes an event.</div></div></div></div></div>';
+        '<div class="hm-way">' + UI.icon('image') + '<div><b>Drop in screenshots</b><div class="muted small">The text in them is read on your device, so a poster becomes an event.</div></div></div>' +
+        '<div class="hm-way">' + UI.icon('phone') + '<div><b>Tidy up on your phone</b><div class="muted small">Share a pile of tabs or screenshots from your phone and swipe through them. <a href="#tidy" data-go="tidy">How</a></div></div></div></div></div>';
     }
     function draw(d) {
       data = d;
@@ -2008,7 +2046,9 @@
         '<form class="hm-quick" data-quick><input type="text" name="q" placeholder="Paste a link or a Maps pin, or jot an idea…" data-ph-short="Link, Maps pin or idea…" autocomplete="off" aria-label="Save something">' +
         '<a class="ui-btn icon" href="#add/photo" data-go="add/photo" title="Add pictures" aria-label="Add pictures">' + UI.icon('camera') + '</a>' +
         '<button class="ui-btn primary" type="submit">' + UI.icon('plus') + 'Save</button></form>' +
-        '<p class="hm-hint">Links are read and sorted for you. Plain text becomes a note (start with “idea:” for an idea).</p>';
+        '<p class="hm-hint">Links are read and sorted for you. Plain text becomes a note (start with “idea:” for an idea).</p>' +
+        '<div class="hm-tidy"><a class="ui-btn sm" href="#tidy/tabs" data-go="tidy/tabs">' + UI.icon('tabs') + 'Tidy my open tabs</a>' +
+        '<a class="ui-btn sm" href="#tidy/shots" data-go="tidy/shots">' + UI.icon('image') + 'Sweep my screenshots</a></div>';
       if (d.inbox) html += '<a class="hm-inbox" href="#inbox"><span class="big">' + d.inbox + '</span><div class="grow"><b>' + (d.inbox === 1 ? 'thing is' : 'things are') + ' waiting in your inbox</b>' +
         '<div class="muted small">Already sorted with a suggestion each. Confirm them in a minute.</div></div><span class="ui-btn sm primary">Sort now ' + UI.icon('arrow') + '</span></a>';
       if (!d.count_all) { html += welcome() + '</div>'; view.innerHTML = html; return; }
@@ -2105,6 +2145,7 @@
           (f.cat !== 'other' ? '<span class="fb-conf" title="How sure: ' + conf + '%"><i style="width:' + conf + '%"></i></span><span class="muted small">' + (conf >= 70 ? 'Pretty sure' : conf >= 45 ? 'Likely' : 'A guess') + '</span>' : '<span class="muted small">Not sure yet: pick one</span>') + '</div>' +
           ((f.reasons || []).length ? '<div class="fb-why">Why: ' + f.reasons.slice(0, 3).map(function (r) { return '<span class="fb-tag">' + esc(r) + '</span>'; }).join('') + '</div>' : '')
           : '<div class="fb-why">' + UI.icon('refresh') + ' Reading this page…</div>') +
+        aiHtml(f) +
         ((f.tags || []).length ? '<div class="fb-tags">' + f.tags.slice(0, 5).map(function (t) { return '<span class="fb-tag">#' + esc(t) + '</span>'; }).join('') + '</div>' : '') +
         '<div class="ib-actions"><button class="ui-btn primary sm" data-keep>' + UI.icon('check') + '<span class="lbl">Keep' + (f.cat !== 'other' ? ' as ' + esc(c.name) : '') + '</span></button>' +
         '<button class="ui-btn sm" data-change>' + UI.icon('tag') + '<span class="lbl">Change</span></button>' +
@@ -2114,6 +2155,26 @@
         '<button class="ui-btn sm icon danger" data-delete title="Delete" aria-label="Delete">' + UI.icon('trash') + '</button>' +
         (f.url ? '<a class="ui-btn sm ghost" href="' + esc(f.url) + '" target="_blank" rel="noopener">' + UI.icon('external') + '<span class="lbl">Open</span></a>' : '') +
         '</div><div data-picker hidden></div></div></article>';
+    }
+    function aiHtml(f) {
+      var a = f.meta && f.meta.ai_sort;
+      if (!a || !a.cat || a.cat === f.cat) return '';
+      var c = FB.cat(a.cat);
+      return '<div class="ib-ai">' + UI.icon('sparkle') + '<span><b>AI suggests ' + esc(c.emoji + ' ' + c.name) + '</b>' + (a.why ? ': ' + esc(a.why) : '') + '</span>' +
+        '<button class="ui-btn sm" data-ai-use>Use this</button></div>';
+    }
+    function askAI() {
+      if (!alive || !(FB.aiSort && FB.aiSort.available && FB.aiSort.on)) return;
+      var unsure = items.filter(function (f) { return f.enriched && !f.confirmed && f.conf < 0.55 && !(f.meta && f.meta.ai_sort); });
+      if (!unsure.length || pending) return;
+      UI.apiQuiet('ai_second_opinion').then(function (r) {
+        if (!alive) return;
+        r.faves.forEach(function (f) {
+          var i = items.findIndex(function (x) { return x.id === f.id; });
+          var el = view.querySelector('.ib-item[data-id="' + CSS.escape(f.id) + '"]');
+          if (i >= 0 && el) { items[i] = f; el.outerHTML = itemHtml(f); }
+        });
+      }).catch(function (err) { console.warn('AI second opinion:', err && err.message); });
     }
     function draw(d) {
       items = d.faves; lists = d.lists || []; pending = d.pending; startPending = Math.max(startPending, d.pending);
@@ -2129,7 +2190,7 @@
             '<div class="ui-row" style="justify-content:center"><a class="ui-btn primary" href="#add" data-go="add">' + UI.icon('plus') + 'Save something</a><a class="ui-btn" href="#home" data-go="home">See your faves</a></div></div>') + '</div>';
       setFocus(0, true);
       progress();
-      if (pending) enrichLoop();
+      if (pending) enrichLoop(); else askAI();
     }
     function progress() {
       var el = view.querySelector('[data-progress]'); if (!el) return;
@@ -2148,7 +2209,7 @@
           if (i >= 0 && el) { items[i] = f; el.outerHTML = itemHtml(f); }
         });
         progress();
-        if (pending) setTimeout(enrichLoop, 300);
+        if (pending) setTimeout(enrichLoop, 300); else askAI();
       }, function () { pending = 0; progress(); });
     }
     function setFocus(i, quiet) {
@@ -2200,6 +2261,10 @@
       focus = Array.prototype.indexOf.call(view.querySelectorAll('.ib-item'), card);
       var pickCat = e.target.closest('[data-cat]');
       if (pickCat) { act(id, 'keep', pickCat.getAttribute('data-cat')); return; }
+      if (e.target.closest('[data-ai-use]')) {
+        UI.busy(e.target.closest('button'), UI.api('ai_use', id)).then(function (r) { var c = FB.cat(r.fave.cat); remove(id, 'Kept in ' + c.emoji + ' ' + c.name); });
+        return;
+      }
       if (e.target.closest('[data-keep]')) { UI.busy(e.target.closest('button'), act(id, 'keep')); return; }
       if (e.target.closest('[data-archive]')) { act(id, 'archive'); return; }
       if (e.target.closest('[data-snooze]')) { act(id, 'snooze'); return; }
@@ -2267,25 +2332,27 @@
     bandLead: 'They’ll be waiting for you, sorted, on your map.'
   };
 
-  function chip(cls, ic, bg, title, sub) {
-    return '<div class="lh-chip ' + cls + '"><span class="ic" style="background:' + bg + '">' + ic + '</span><span>' + title + '<small>' + sub + '</small></span></div>';
-  }
+  // The hero map: a made-up city corner (gentle street grid, a park, a river) with your faves pinned by kind.
+  // Pins sit right of the card on desktop, across the top on phones.
   function heroArt() {
-    var rows = [['☕', 'Cafés', 12, '#b08968', 80], ['🧑‍🍳', 'Recipes', 9, '#ef5350', 62], ['🎟️', 'Events', 4, '#ffb300', 34], ['📖', 'Reading', 15, '#42a5f5', 92], ['🌳', 'Parks', 6, '#66bb6a', 45]];
-    var pins = [['☕', '#b08968', 22, 30], ['🍜', '#ff8a65', 62, 22], ['🌳', '#66bb6a', 18, 58], ['🎟️', '#ffb300', 70, 62], ['📖', '#42a5f5', 40, 74]];
-    return '<div class="lp-art" aria-hidden="true">' +
-      chip('lh-c1', '🗂️', 'var(--c-brand-soft)', '43 open tabs', 'saved as one tab set') +
-      chip('lh-c2', '📍', 'color-mix(in srgb,#66bb6a 22%,transparent)', 'maps.app.goo.gl/…', 'becomes a pin') +
-      chip('lh-c3', '🖼️', 'var(--c-accent-soft)', 'Screenshot_2041.png', '“Samedi 19h, Parc…”') +
-      chip('lh-c4', '💡', 'color-mix(in srgb,#fdd835 30%,transparent)', 'idea: picnic map', 'a note, filed') +
-      '<svg class="lh-flow" viewBox="0 0 60 100" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-dasharray="2 7"><path d="M4 8C40 14 40 40 52 50"/><path d="M4 92C40 86 40 60 52 50"/><path d="M44 42l9 8-11 4" stroke-dasharray="none"/></svg>' +
-      '<div class="lh-board"><div class="hd">Your faves <span>4 to sort</span></div>' + rows.map(function (r) {
-        return '<div class="lh-row"><span>' + r[0] + '</span><span>' + r[1] + '</span><span class="n">' + r[2] + '</span><span class="bar"><i style="width:' + r[4] + '%;background:' + r[3] + '"></i></span></div>';
-      }).join('') + '</div>' +
-      '<div class="lh-map"><span class="pk"></span><span class="rd" style="left:0;right:0;top:44%;height:7px"></span><span class="rd" style="top:0;bottom:0;left:56%;width:7px"></span>' +
-      '<span class="rd" style="left:-10%;width:130%;top:20%;height:5px;transform:rotate(-14deg)"></span>' +
-      pins.map(function (p) { return '<span class="lh-pin" style="--p:' + p[1] + ';left:' + p[2] + '%;top:' + p[3] + '%"><span>' + p[0] + '</span></span>'; }).join('') +
-      '<span class="lh-me"></span><span class="lh-tag">● 3 open now nearby</span></div></div>';
+    var streets = '', i;
+    for (i = -6; i < 22; i++) streets += '<path d="M' + (i * 130) + ' -200 L' + (i * 130 + 240) + ' 900"/>';
+    for (i = -4; i < 14; i++) streets += '<path d="M-300 ' + (i * 96) + ' L1600 ' + (i * 96 - 120) + '"/>';
+    var map = '<div class="lh-mapbg" aria-hidden="true"><svg viewBox="0 0 1280 640" preserveAspectRatio="xMidYMid slice">' +
+      '<rect width="1280" height="640" fill="var(--land)"/>' +
+      '<path d="M1140 -20 C1100 160 1210 300 1150 460 S1180 600 1220 680 L1300 680 L1300 -20 Z" fill="var(--water)"/>' +
+      '<path d="M800 380 C860 340 960 350 990 410 C1010 470 940 520 860 510 C800 500 760 430 800 380 Z" fill="var(--park)"/>' +
+      '<g stroke="var(--casing)" stroke-width="15" fill="none">' + streets + '</g>' +
+      '<g stroke="var(--street)" stroke-width="10" fill="none">' + streets + '</g>' +
+      '<path d="M500 -40 C700 200 900 260 1300 300" stroke="var(--casing)" stroke-width="24" fill="none"/><path d="M500 -40 C700 200 900 260 1300 300" stroke="var(--street)" stroke-width="18" fill="none"/>' +
+      '<g fill="var(--label)" font-family="inherit" font-size="13" font-weight="700" letter-spacing="2"><text x="836" y="450">PARK</text><text x="1180" y="120" transform="rotate(80 1180 120)">RIVER</text></g>' +
+      '</svg></div>';
+    var pins = [['☕', '#b08968', 64, 30, 1], ['🍜', '#ff8a65', 78, 22, 0], ['🌳', '#66bb6a', 69, 66, 0], ['🎟️', '#ffb300', 90, 38, 0], ['📖', '#42a5f5', 86, 70, 1],
+                ['🧑‍🍳', '#ef5350', 58, 52, 0], ['🖼️', '#ab47bc', 95, 18, 0]];
+    return map + '<div class="lh-pins" aria-hidden="true"><span class="lh-me" style="left:76%;top:46%"></span>' +
+      pins.map(function (p, n) { return '<span class="lh-pin' + (p[4] ? ' open' : '') + '" style="--p:' + p[1] + ';left:' + p[2] + '%;top:' + p[3] + '%;animation-delay:' + (n * .1) + 's"><span>' + p[0] + '</span></span>'; }).join('') +
+      '<div class="lh-pop" style="left:64%;top:30%"><b>Café Olimpico</b><span class="ok">● Open now</span> · 300 m · saved from a tab in March</div></div>' +
+      '<div class="lh-saved" aria-hidden="true"><span class="ic">🗂️</span><span>maps.app.goo.gl/x7…<small>Filed as <b>Restaurant</b>, because OpenStreetMap says so</small></span></div>';
   }
 
   UI.page('landing', { title: 'Your favourite things, sorted' }, function (view, ctx) {
@@ -2294,11 +2361,11 @@
       : '<a class="ui-btn primary lg" href="#auth/signup" data-go="auth/signup">' + esc(C.cta) + ' ' + UI.icon('arrow') + '</a>' +
         '<a class="ui-btn lg" href="#auth" data-go="auth">I have an account</a>';
     view.innerHTML =
-      '<section class="lp-hero"><div class="ui-wrap"><div>' +
+      '<section class="lp-hero">' + heroArt() + '<div class="ui-wrap"><div class="lh-card">' +
         '<div class="eyebrow">' + esc(C.eyebrow) + '</div><h1>' + C.title + '</h1><p class="lp-lead">' + esc(C.lead) + '</p>' +
         '<div class="lp-cta">' + primary + '</div>' +
         '<div class="lp-proof">' + C.proof.map(function (p) { return '<span>' + UI.icon('check') + esc(p) + '</span>'; }).join('') + '</div>' +
-      '</div>' + heroArt() + '</div></section>' +
+      '</div></div></section>' +
       '<section class="lp-section" id="how"><div class="ui-wrap"><div class="lp-head"><h2>' + esc(C.stepsTitle) + '</h2><p>' + esc(C.stepsLead) + '</p></div>' +
         '<div class="lp-steps">' + C.steps.map(function (s) { return '<div class="ui-card lp-step"><span class="em">' + s[0] + '</span><h3>' + esc(s[1]) + '</h3><p class="muted">' + esc(s[2]) + '</p></div>'; }).join('') + '</div></div></section>' +
       '<section class="lp-section"><div class="ui-wrap"><div class="lp-head"><h2>' + esc(C.featuresTitle) + '</h2></div>' +
@@ -2819,10 +2886,543 @@
   });
 })();
 
+/* ===== tidy.html ===== */
+(function () {
+  'use strict';
+  var esc = UI.esc;
+  var incoming = null;   // what #share/<code> handed over: {code, links, photos, note, name}
+
+  function isPhone() { return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent); }
+  function platform() { var u = navigator.userAgent; return /iPhone|iPad|iPod/i.test(u) ? 'ios' : /Android/i.test(u) ? 'android' : 'desktop'; }
+  function installed() { return window.matchMedia && window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true; }
+  function pct(x) { return Math.round((x || 0) * 100) + '%'; }
+
+  /* ------------------------------------------------------------------ how to get things in (hub + tabs input) */
+  function howTabs() {
+    return {
+      android: '<ol><li>Install Faves Buddy once (button above, or Chrome menu <b>⋮ → Add to Home screen</b>).</li>' +
+        '<li>In Chrome, open the tab switcher, touch and hold any tab (or tap <b>⋮</b>) and choose <b>Select tabs</b>.</li>' +
+        '<li>Tick the tabs (or all of them), tap <b>⋮ → Share tabs</b> and pick <b>Faves Buddy</b>.</li>' +
+        '<li>They open here, already sorted. Swipe through them. Close the tabs in Chrome afterwards.</li></ol>',
+      ios: '<ol><li>In Safari, open the tab overview, then touch and hold the tab group\'s name (or tap <b>⋯</b>) and choose <b>Copy N Links</b>.</li>' +
+        '<li>Come back here, open <b>Sort my open tabs</b> and tap <b>Paste</b>. The titles come along.</li>' +
+        '<li>Chrome on iPhone: in the tab grid tap <b>Edit → Select tabs</b>, pick them, then <b>Share → Copy</b>, and paste here.</li></ol>',
+      desktop: '<ol><li>Install the <a href="#tools" data-go="tools">Chrome extension</a> and connect it.</li>' +
+        '<li>Open it and look under <b>Tabs on your other devices</b>: with Chrome sync on, your phone\'s open Chrome tabs are listed there.</li>' +
+        '<li>Tap <b>Sort these</b> and they open here as a pile to swipe through. (Or save this computer\'s window in one click.)</li></ol>'
+    };
+  }
+  function helpPanel() {
+    var p = platform(), h = howTabs();
+    var inst = installed() ? '<p class="ok small">' + UI.icon('check') + ' Faves Buddy is installed on this device.</p>'
+      : (window.fbInstallPrompt ? '<button class="ui-btn primary" data-install>' + UI.icon('download') + 'Install Faves Buddy on this device</button>' : '');
+    var sec = function (id, icon, title, body) { return '<details' + (p === id ? ' open' : '') + '><summary>' + UI.icon(icon) + title + '</summary>' + body + '</details>'; };
+    return '<div class="fb-panel td-help"><h2 style="margin-top:0">Getting your tabs and screenshots in</h2>' + inst +
+      sec('android', 'phone', 'Android phone (Chrome)', h.android +
+        '<p class="small muted" style="margin:10px 0 0">Screenshots: in Photos or Gallery, select several, tap <b>Share</b> and pick <b>Faves Buddy</b>. Or use <b>Sweep my screenshots</b> above.</p>') +
+      sec('ios', 'phone', 'iPhone or iPad', h.ios +
+        '<p class="small muted" style="margin:10px 0 0">Screenshots: <b>Sweep my screenshots</b> lets you pick a batch from the Screenshots album. To keep Faves Buddy on your Home Screen: Safari <b>Share → Add to Home Screen</b>.</p>') +
+      sec('desktop', 'puzzle', 'A computer (Chrome extension)', h.desktop) + '</div>';
+  }
+  window.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); window.fbInstallPrompt = e; });
+
+  /* ------------------------------------------------------------------ hub */
+  function hub(view) {
+    var saved = UI.store.get('tidy.tabs', null), left = saved && saved.items ? saved.items.length - saved.idx : 0;
+    var job = function (to, icon, title, text, cls) {
+      return '<a class="td-job ' + (cls || '') + '" href="#tidy/' + to + '" data-go="tidy/' + to + '"><span class="ic">' + UI.icon(icon) + '</span><span><h2>' + title + '</h2><p>' + text + '</p></span></a>';
+    };
+    view.innerHTML = '<div class="ui-wrap td-wrap"><div class="ui-page-head"><div><h1>Tidy up</h1><p class="muted">Clear a pile in a few minutes. Everything is already sorted for you: say yes, move it, or skip it.</p></div></div>' +
+      '<div class="td-big">' + job('tabs', 'tabs', 'Sort my open tabs', left > 0 ? 'You have ' + UI.plural(left, 'tab') + ' left from last time. Pick up where you left off.' : 'Share or paste a pile of tabs, then swipe: keep, move or skip.') +
+      job('shots', 'image', 'Sweep my screenshots', 'Pick your screenshots. Their text is read on this device and each one is sorted for you.', 'coral') + '</div>' +
+      '<div data-waiting></div>' + helpPanel() + '</div>';
+    return UI.apiQuiet('drops_waiting').then(function (r) {
+      if (!r.drops.length) return;
+      view.querySelector('[data-waiting]').innerHTML = '<h2>Shared with Faves Buddy, still to tidy</h2><div class="td-wait">' + r.drops.map(function (d) {
+        var what = [d.links ? UI.plural(d.links, 'link') : '', d.photos ? UI.plural(d.photos, 'picture') : ''].filter(Boolean).join(' and ');
+        return '<div class="td-wait-row">' + UI.icon('share') + '<div class="grow"><b>' + esc(d.name || what) + '</b><div class="muted small">' + esc(what) + ' · ' + esc(UI.ago(d.created)) + '</div></div>' +
+          '<a class="ui-btn sm primary" href="#share/' + esc(d.code) + '">Tidy</a><button class="ui-btn sm ghost" data-discard="' + esc(d.code) + '" aria-label="Throw away">' + UI.icon('trash') + '</button></div>';
+      }).join('') + '</div>';
+    }).catch(function () {});
+  }
+
+  /* ------------------------------------------------------------------ tabs */
+  function linksFromHtml(html) {
+    var doc = new DOMParser().parseFromString(html, 'text/html'), out = [];
+    doc.querySelectorAll('a[href]').forEach(function (a) {
+      var u = a.getAttribute('href');
+      if (/^https?:/i.test(u)) out.push(u + ' | ' + (a.textContent || '').replace(/\s+/g, ' ').trim());
+    });
+    return out;
+  }
+
+  function tabsMode(view) {
+    var st = null;   // {items, idx, dec: {url: {act, cat}}, drop, name, history: [url]}
+    var mode = UI.store.get('tidy.view', 'deck');
+    var fetching = {};
+    function save() { if (st) UI.store.set('tidy.tabs', st); }
+    function clear() { st = null; UI.store.set('tidy.tabs', null); }
+    function frame(inner) {
+      view.innerHTML = '<div class="ui-wrap td-wrap"><div class="ui-page-head"><div><a class="ui-btn ghost sm" href="#tidy" data-go="tidy">' + UI.icon('back') + 'Tidy up</a><h1>Sort my open tabs</h1></div></div><div data-body>' + inner + '</div></div>';
+    }
+    function inputScreen() {
+      var p = platform();
+      frame('<div class="fb-panel td-input ui-stack"><div><h2 style="margin:0 0 4px">Your tabs</h2><p class="muted small" style="margin:0">One link per line. Pasting Safari\'s or Chrome\'s copied links keeps their titles. Nothing is opened yet; they\'re sorted from the link and title.</p></div>' +
+        '<textarea data-paste placeholder="https://…&#10;https://…" spellcheck="false"></textarea>' +
+        '<div class="ui-row"><button class="ui-btn" data-clip>' + UI.icon('copy') + 'Paste</button><span class="grow"></span><button class="ui-btn primary lg" data-sort>' + UI.icon('sort') + 'Sort them</button></div></div>' +
+        '<div class="fb-panel td-help" style="margin-top:18px"><details open><summary>' + UI.icon('info') + 'How to get my tabs here</summary>' + howTabs()[p] +
+        (p !== 'desktop' ? '' : '<p class="small muted">On a phone? Open Faves Buddy there: Android shares tabs straight in, iPhone copies them in one go.</p>') + '</details></div>');
+    }
+    function start(links, drop, name) {
+      st = { items: links.map(function (l) { return Object.assign({}, l); }), idx: 0, dec: {}, drop: drop || null, name: name || '', history: [] };
+      save(); render();
+    }
+    function decided(a) { return st.items.filter(function (it) { return st.dec[it.url] && st.dec[it.url].act === a; }).length; }
+    function catOf(it) { return (st.dec[it.url] && st.dec[it.url].cat) || it.pick || it.cat; }
+    function render() {
+      if (!st) return inputScreen();
+      if (st.idx >= st.items.length) return finish();
+      return mode === 'list' ? listView() : deckView();
+    }
+    function topBar() {
+      var n = st.items.length;
+      return '<div class="td-top"><div><b>' + (mode === 'deck' ? 'Tab ' + Math.min(st.idx + 1, n) + ' of ' + n : n + ' tabs') + '</b> <span class="muted small">· ' +
+        decided('keep') + ' kept · ' + decided('later') + ' later · ' + decided('skip') + ' skipped</span></div>' +
+        '<div class="ui-seg" role="group" aria-label="View"><button type="button" data-view="deck" class="' + (mode === 'deck' ? 'on' : '') + '">Cards</button><button type="button" data-view="list" class="' + (mode === 'list' ? 'on' : '') + '">List</button></div></div>' +
+        '<div class="td-bar"><i style="width:' + (st.idx / n * 100) + '%"></i></div>';
+    }
+    function sureLeft() { return st.items.slice(st.idx).filter(function (it) { return !st.dec[it.url] && it.conf >= 0.6 && it.cat !== 'other' && !it.already; }); }
+    function deckView() {
+      var it = st.items[st.idx], cat = catOf(it), c = FB.cat(cat), sure = sureLeft();
+      var f = { id: it.url, title: it.title, cat: cat, kind: it.kind === 'place' ? 'place' : 'link', image: it.image };
+      frame(topBar() + (sure.length > 2 ? '<div class="td-sure">' + UI.icon('sparkle') + '<span><b>' + sure.length + '</b> of these tabs are sorted with confidence.</span><button class="ui-btn sm" data-sure>Keep them as sorted</button></div>' : '') +
+        '<div class="td-stage"><div class="td-card" data-card><span class="td-stamp keep">KEEP</span><span class="td-stamp skip">SKIP</span>' + FB.cover(f) +
+        '<h2>' + esc(it.title || it.domain) + '</h2><div class="fb-sub">' + UI.icon('globe') + '<span>' + esc(it.site || it.domain) + '</span></div>' +
+        (it.desc ? '<p class="td-desc">' + esc(it.desc) + '</p>' : '') +
+        (it.already ? '<div class="td-already">' + UI.icon('check') + 'Already saved, in ' + esc(FB.cat(it.already_cat).emoji + ' ' + FB.cat(it.already_cat).name) + '</div>' : '') +
+        '<div class="td-sorted"><div class="fb-why">' + (it.cat !== 'other' ? FB.catChip(it.cat) + ' ' + pct(it.conf) + ' sure: ' + (it.reasons || []).map(function (x) { return '<span class="fb-tag">' + esc(x) + '</span>'; }).join('') : 'Not sure where this goes: pick one.') + '</div>' +
+        '<div class="td-cats" data-cats>' + FB.CATS.map(function (k) { return '<button type="button" class="fb-chip sm' + (k.id === cat ? ' on' : '') + '" data-cat="' + k.id + '">' + k.emoji + ' ' + esc(k.name) + '</button>'; }).join('') + '</div></div></div>' +
+        '<div class="td-acts"><button class="ui-btn" data-act="skip" title="Skip (←)">' + UI.icon('x') + '<span>Skip</span></button>' +
+        '<button class="ui-btn" data-act="later" title="Later: to the inbox (↓)">' + UI.icon('inbox') + 'Later</button>' +
+        '<button class="ui-btn primary" data-act="keep" title="Keep (→)">' + UI.icon('heart') + '<span>' + (cat === 'other' ? 'Keep' : '<span class="kin">Keep in </span>' + esc(c.emoji + ' ' + c.name)) + '</span></button></div>' +
+        '<div class="td-under"><button class="ui-btn ghost sm" data-undo' + (st.history.length ? '' : ' disabled') + '>' + UI.icon('back') + 'Undo</button>' +
+        '<a class="ui-btn ghost sm" href="' + esc(it.url) + '" target="_blank" rel="noopener">' + UI.icon('external') + 'Open the page</a>' +
+        '<button class="ui-btn ghost sm" data-finish>Finish now</button></div></div>');
+      wireSwipe(view.querySelector('[data-card]'));
+      prefetch();
+    }
+    function listView() {
+      var rest = st.items.slice(st.idx);
+      frame(topBar() + '<p class="muted small">Untick what you don\'t want. Change a category with the menu. Then save them all.</p><div class="td-list">' + rest.map(function (it, i) {
+        var d = st.dec[it.url], on = d ? d.act !== 'skip' : (it.conf >= 0.5 && !it.already);
+        return '<label class="td-row"><input type="checkbox" data-row="' + i + '"' + (on ? ' checked' : '') + '><span style="min-width:0"><b>' + esc(it.title || it.domain) + '</b><span class="muted small">' + esc(it.domain) +
+          (it.already ? ' · already saved' : '') + '</span></span><select data-rowcat="' + i + '" aria-label="Category">' + FB.CATS.map(function (k) {
+            return '<option value="' + k.id + '"' + (k.id === catOf(it) ? ' selected' : '') + '>' + k.emoji + ' ' + esc(k.name) + '</option>'; }).join('') + '</select></label>';
+      }).join('') + '</div><div class="td-sticky"><button class="ui-btn primary lg" data-listdone>' + UI.icon('check') + 'Done: save the ticked ones</button></div>');
+    }
+    function decide(act, cat) {
+      var it = st.items[st.idx];
+      st.dec[it.url] = { act: act, cat: cat || catOf(it) };
+      st.history.push(it.url); st.idx++; save();
+      var card = view.querySelector('[data-card]');
+      if (card) {
+        card.style.transform = act === 'skip' ? 'translateX(-120%) rotate(-12deg)' : act === 'keep' ? 'translateX(120%) rotate(12deg)' : 'translateY(60px)';
+        card.style.opacity = '0';
+        setTimeout(render, 180);
+      } else render();
+    }
+    function undo() {
+      if (!st.history.length) return;
+      var url = st.history.pop(); delete st.dec[url];
+      st.idx = Math.max(0, st.items.findIndex(function (it) { return it.url === url; }));
+      save(); render();
+    }
+    function wireSwipe(card) {
+      if (!card) return;
+      var x0 = null, y0 = 0, dx = 0, stamps = card.querySelectorAll('.td-stamp');
+      card.addEventListener('pointerdown', function (e) {
+        if (e.target.closest('button, a, .td-cats')) return;
+        x0 = e.clientX; y0 = e.clientY; dx = 0; card.classList.add('drag');
+      });
+      card.addEventListener('pointermove', function (e) {
+        if (x0 == null) return;
+        dx = e.clientX - x0;
+        if (Math.abs(dx) < 8 || Math.abs(e.clientY - y0) > Math.abs(dx) * 1.2) return;
+        card.style.transform = 'translateX(' + dx + 'px) rotate(' + dx / 22 + 'deg)';
+        stamps[0].style.opacity = Math.max(0, Math.min(1, dx / 90)); stamps[1].style.opacity = Math.max(0, Math.min(1, -dx / 90));
+      });
+      var end = function () {
+        if (x0 == null) return;
+        x0 = null; card.classList.remove('drag');
+        if (dx > 90) decide('keep'); else if (dx < -90) decide('skip');
+        else { card.style.transform = ''; stamps[0].style.opacity = stamps[1].style.opacity = 0; }
+      };
+      card.addEventListener('pointerup', end); card.addEventListener('pointercancel', end); card.addEventListener('pointerleave', end);
+    }
+    function prefetch() {
+      var want = st.items.slice(st.idx, st.idx + 4).filter(function (it) { return !it.detail && !fetching[it.url]; });
+      if (!want.length) return;
+      want.forEach(function (it) { fetching[it.url] = true; });
+      UI.apiQuiet('triage_detail', want.map(function (it) { return it.url; })).then(function (r) {
+        var cur = st && st.items[st.idx], redraw = false;
+        (r.pages || []).forEach(function (p) {
+          var it = st && st.items.find(function (x) { return x.url === p.url; });
+          if (!it) return;
+          it.detail = true;
+          if (p.failed) return;
+          if (p.title && (!it.title || it.title === it.domain)) it.title = p.title;
+          it.image = p.image || it.image; it.desc = p.desc || it.desc; it.site = p.site || it.site; it.meta = p.meta;
+          if (p.kind === 'place') { it.kind = 'place'; it.lat = p.lat; it.lng = p.lng; it.address = p.address; }
+          if (!it.pick && !(st.dec[it.url]) && p.conf >= it.conf) { it.cat = p.cat; it.conf = p.conf; it.reasons = p.reasons; }
+          if (it === cur) redraw = true;
+        });
+        save();
+        if (redraw && mode === 'deck' && !view.querySelector('.td-card.drag')) deckView();
+      }).catch(function () { want.forEach(function (it) { it.detail = true; }); });
+    }
+    function finish() {
+      var keep = st.items.filter(function (it) { return st.dec[it.url] && st.dec[it.url].act === 'keep'; });
+      var later = st.items.filter(function (it) { return st.dec[it.url] && st.dec[it.url].act === 'later'; });
+      var skip = st.items.length - keep.length - later.length, tally = {};
+      keep.forEach(function (it) { var c = st.dec[it.url].cat; tally[c] = (tally[c] || 0) + 1; });
+      var name = st.name || 'Tidied tabs, ' + new Date().toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+      frame('<div class="fb-panel td-done"><div class="big">🧹</div><h2>' + (keep.length + later.length ? 'Ready to save' : 'All skipped') + '</h2>' +
+        '<p class="muted">' + UI.plural(keep.length, 'tab') + ' to keep, ' + later.length + ' for later (inbox), ' + skip + ' skipped.</p>' +
+        '<div class="td-tally">' + Object.keys(tally).map(function (k) { return '<span class="fb-chip sm on">' + FB.cat(k).emoji + ' ' + esc(FB.cat(k).name) + ' · ' + tally[k] + '</span>'; }).join('') + '</div>' +
+        (keep.length + later.length > 1 ? '<div class="td-group"><label class="ui-check"><input type="checkbox" data-group' + (keep.length + later.length >= 5 ? ' checked' : '') + '> Also keep them together as a tab set, to reopen them all at once</label>' +
+          '<input type="text" data-groupname maxlength="80" value="' + esc(name) + '" aria-label="Tab set name"></div>' : '') +
+        '<div class="ui-row" style="justify-content:center;margin-top:20px"><button class="ui-btn ghost" data-back>' + UI.icon('back') + 'Back to the cards</button>' +
+        '<button class="ui-btn primary lg" data-save>' + UI.icon('heart') + (keep.length + later.length ? 'Save ' + (keep.length + later.length) : 'Done') + '</button></div></div>');
+    }
+    function doSave(btn) {
+      var items = st.items.filter(function (it) { return st.dec[it.url] && st.dec[it.url].act !== 'skip'; }).map(function (it) {
+        var d = st.dec[it.url];
+        return { url: it.url, title: it.title, category: d.act === 'keep' && d.cat !== 'other' ? d.cat : null, meta: it.meta || {}, kind: it.kind, lat: it.lat, lng: it.lng, address: it.address };
+      });
+      var g = view.querySelector('[data-group]'), group = g && g.checked ? (view.querySelector('[data-groupname]').value || '').trim() : null, drop = st.drop;
+      var other = incoming && incoming.code === drop && incoming.photos && incoming.photos.length ? incoming.photos.length : 0;
+      return UI.busy(btn, UI.api('triage_save', items, group, drop)).then(function (r) {
+        clear();
+        frame('<div class="fb-panel td-done"><div class="big">✨</div><h2>Tidy!</h2><p class="muted">' + (r.saved ? UI.plural(r.saved, 'new fave') + ' saved' : 'Nothing new saved') + (r.again ? ', ' + r.again + ' were already there' : '') + '.</p>' +
+          '<div class="td-tally">' + Object.keys(r.by_cat).map(function (k) { return '<a class="fb-chip sm" href="#home/cat/' + k + '">' + FB.cat(k).emoji + ' ' + esc(FB.cat(k).name) + ' · ' + r.by_cat[k] + '</a>'; }).join('') + '</div>' +
+          '<div class="ui-row" style="justify-content:center">' + (other ? '<a class="ui-btn primary" href="#tidy/shots" data-go="tidy/shots">' + UI.icon('image') + 'Now sweep the ' + UI.plural(other, 'picture') + ' you shared</a>' : '') +
+          (r.tabset ? '<a class="ui-btn" href="#tabs" data-go="tabs">' + UI.icon('tabs') + 'See the tab set</a>' : '') +
+          '<a class="ui-btn" href="#inbox" data-go="inbox">' + UI.icon('inbox') + 'Inbox</a><a class="ui-btn ghost" href="#tidy" data-go="tidy">Tidy more</a></div></div>');
+      });
+    }
+    function sortText(text, btn) {
+      return UI.busy(btn, UI.api('triage_links', null, text)).then(function (r) {
+        if (!r.links.length) { UI.toast('No links found there.', 'error'); return; }
+        start(r.links, null, '');
+      });
+    }
+
+    view.addEventListener('click', function (e) {
+      var b = e.target.closest('button, a'); if (!b || !view.contains(b)) return;
+      if (b.hasAttribute('data-clip')) {
+        var box = view.querySelector('[data-paste]');
+        var put = function (t) { box.value = (box.value ? box.value.replace(/\s*$/, '\n') : '') + t; };
+        var p = navigator.clipboard && navigator.clipboard.read ? navigator.clipboard.read().then(function (items) {
+          var it = items.find(function (x) { return x.types.indexOf('text/html') >= 0; });
+          if (it) return it.getType('text/html').then(function (bl) { return bl.text(); }).then(function (h) { var l = linksFromHtml(h); if (l.length) return put(l.join('\n')); return navigator.clipboard.readText().then(put); });
+          return navigator.clipboard.readText().then(put);
+        }) : navigator.clipboard ? navigator.clipboard.readText().then(put) : Promise.reject();
+        p.catch(function () { box.focus(); UI.toast('Long-press the box and choose Paste.'); });
+        return;
+      }
+      if (b.hasAttribute('data-sort')) { var t = view.querySelector('[data-paste]').value; if (!t.trim()) { UI.toast('Paste some links first.', 'error'); return; } sortText(t, b); return; }
+      if (b.hasAttribute('data-view')) { mode = b.getAttribute('data-view'); UI.store.set('tidy.view', mode); render(); return; }
+      if (b.hasAttribute('data-cat') && view.querySelector('[data-card]')) {
+        var it = st.items[st.idx]; it.pick = b.getAttribute('data-cat'); save(); deckView(); return;
+      }
+      if (b.hasAttribute('data-act')) { decide(b.getAttribute('data-act')); return; }
+      if (b.hasAttribute('data-undo')) { undo(); return; }
+      if (b.hasAttribute('data-sure')) {
+        sureLeft().forEach(function (x) { st.dec[x.url] = { act: 'keep', cat: x.cat }; });
+        var rest = st.items.slice(st.idx), done = rest.filter(function (x) { return st.dec[x.url]; }), open = rest.filter(function (x) { return !st.dec[x.url]; });
+        st.items = st.items.slice(0, st.idx).concat(done, open); st.idx += done.length; save();
+        UI.toast(UI.plural(done.length, 'tab') + ' kept as sorted.', 'ok'); render(); return;
+      }
+      if (b.hasAttribute('data-finish')) { st.idx = st.items.length; save(); finish(); return; }
+      if (b.hasAttribute('data-listdone')) {
+        st.items.slice(st.idx).forEach(function (it, i) {
+          var on = view.querySelector('[data-row="' + i + '"]').checked, cat = view.querySelector('[data-rowcat="' + i + '"]').value;
+          st.dec[it.url] = { act: on ? 'keep' : 'skip', cat: cat };
+        });
+        st.idx = st.items.length; save(); finish(); return;
+      }
+      if (b.hasAttribute('data-back')) { st.idx = Math.max(0, st.items.findIndex(function (x) { return !st.dec[x.url]; })); if (st.idx < 0 || st.idx >= st.items.length) st.idx = Math.max(0, st.items.length - 1); save(); render(); return; }
+      if (b.hasAttribute('data-save')) { doSave(b); return; }
+      if (b.hasAttribute('data-restart')) { clear(); inputScreen(); }
+    });
+    view.addEventListener('paste', function (e) {
+      if (!e.target.matches('[data-paste]') || !e.clipboardData) return;
+      var h = e.clipboardData.getData('text/html');
+      var l = h ? linksFromHtml(h) : [];
+      if (l.length) { e.preventDefault(); var box = e.target; box.value = (box.value ? box.value.replace(/\s*$/, '\n') : '') + l.join('\n'); }
+    });
+    function onKey(e) {
+      if (!st || mode !== 'deck' || !view.querySelector('[data-card]') || /INPUT|TEXTAREA|SELECT/.test((e.target.tagName || ''))) return;
+      if (e.key === 'ArrowRight') decide('keep'); else if (e.key === 'ArrowLeft') decide('skip'); else if (e.key === 'ArrowDown') decide('later');
+      else if ((e.key === 'z' && (e.ctrlKey || e.metaKey)) || e.key === 'Backspace') undo();
+    }
+    document.addEventListener('keydown', onKey);
+
+    var ready = FB.boot().then(function () {
+      if (incoming && incoming.links && incoming.links.length && !incoming.linksTaken) {
+        incoming.linksTaken = true;
+        return UI.api('triage_links', incoming.links).then(function (r) { start(r.links, incoming.code, incoming.name); });
+      }
+      st = UI.store.get('tidy.tabs', null);
+      if (st && (!st.items || !st.items.length)) st = null;
+      if (st) { st.history = st.history || []; render(); if (st.idx < st.items.length) UI.toast('Picking up where you left off. ' + UI.plural(st.items.length - st.idx, 'tab') + ' to go.'); }
+      else inputScreen();
+    });
+    return { ready: ready, destroy: function () { document.removeEventListener('keydown', onKey); } };
+  }
+
+  /* ------------------------------------------------------------------ screenshots */
+  function fpOf(file) {
+    var s = (file.name || '') + '|' + (file.size || 0) + '|' + (file.lastModified || 0), h1 = 0x811c9dc5, h2 = 0;
+    for (var i = 0; i < s.length; i++) { h1 = Math.imul(h1 ^ s.charCodeAt(i), 16777619) >>> 0; h2 = (h2 * 31 + s.charCodeAt(i)) >>> 0; }
+    return 's' + h1.toString(36) + h2.toString(36);
+  }
+  var idb = {
+    open: function () { return new Promise(function (res, rej) { var r = indexedDB.open('favesbuddy', 1); r.onupgradeneeded = function () { r.result.createObjectStore('kv'); }; r.onsuccess = function () { res(r.result); }; r.onerror = rej; }); },
+    get: function (k) { return idb.open().then(function (db) { return new Promise(function (res) { var q = db.transaction('kv').objectStore('kv').get(k); q.onsuccess = function () { res(q.result); }; q.onerror = function () { res(null); }; }); }).catch(function () { return null; }); },
+    set: function (k, v) { return idb.open().then(function (db) { return new Promise(function (res) { var t = db.transaction('kv', 'readwrite'); t.objectStore('kv').put(v, k); t.oncomplete = res; t.onerror = res; }); }).catch(function () {}); }
+  };
+  var IMG = /\.(png|jpe?g|webp|heic|gif)$/i;
+
+  function shotsMode(view) {
+    var list = [], hidden = [], queue = Promise.resolve(), folder = null;
+    var canFolder = !!window.showDirectoryPicker && !isPhone();
+    function frame() {
+      view.innerHTML = '<div class="ui-wrap td-wrap"><div class="ui-page-head"><div><a class="ui-btn ghost sm" href="#tidy" data-go="tidy">' + UI.icon('back') + 'Tidy up</a><h1>Sweep my screenshots</h1>' +
+        '<p class="muted">Each one is read on this device (free, private: the picture doesn\'t leave your phone for this), then sorted. Keep the useful ones, skip the rest. Skipped ones won\'t show up again.</p></div></div>' +
+        '<div class="fb-panel ui-stack"><div class="td-src"><label class="ui-btn primary lg">' + UI.icon('image') + 'Choose screenshots<input type="file" accept="image/*" multiple hidden data-files></label>' +
+        (canFolder ? '<button class="ui-btn" data-folder>' + UI.icon('layers') + 'Choose a folder</button><span data-folderbox></span>' : '') + '</div>' +
+        '<label class="ui-check small"><input type="checkbox" data-ocr ' + (UI.store.get('tidy.ocr', true) ? 'checked' : '') + '> Read the text in them (the first time downloads the reader, about 10 MB)</label>' +
+        '<p class="muted small" data-seenline style="margin:0"></p>' +
+        (isPhone() ? '<p class="muted small" style="margin:0">' + (platform() === 'ios' ? 'Tip: in the picker, open <b>Albums → Screenshots</b> and select a batch.' : 'Tip: in the picker, open the <b>Screenshots</b> album and select a batch, or share them from Photos to Faves Buddy.') + '</p>' : '') +
+        '</div><div data-summary></div><div class="td-shots" data-shots></div></div>';
+      if (canFolder) idb.get('shots.folder').then(function (h) { folder = h || null; folderBox(); });
+      UI.apiQuiet('shots_seen', []).then(function (r) { seenLine(r.total_seen); });
+    }
+    function seenLine(n) {
+      var el = view.querySelector('[data-seenline]');
+      if (el) el.innerHTML = n ? UI.plural(n, 'screenshot') + ' looked at before will be skipped. <button class="ui-btn ghost sm" data-forget>Show them again next time</button>' : '';
+    }
+    function folderBox() {
+      var b = view.querySelector('[data-folderbox]');
+      if (b) b.innerHTML = folder ? '<button class="ui-btn" data-recheck>' + UI.icon('refresh') + 'Check “' + esc(folder.name) + '” for new ones</button>' : '';
+    }
+    function summary() {
+      var n = function (s) { return list.filter(function (x) { return x.status === s; }).length; };
+      var ready = n('ready'), busy = n('queued') + n('reading'), kept = n('kept') + n('later'), skipped = n('skipped');
+      var el = view.querySelector('[data-summary]'); if (!el) return;
+      el.innerHTML = list.length || hidden.length ? '<div class="td-summary"><span class="grow">' + [ready ? '<b>' + ready + ' ready</b>' : '', busy ? busy + ' reading' : '', kept ? kept + ' kept' : '', skipped ? skipped + ' skipped' : ''].filter(Boolean).join(' · ') +
+        (hidden.length ? ' · ' + hidden.length + ' seen before, hidden <button class="ui-btn ghost sm" data-showhidden>Show</button>' : '') + '</span>' +
+        (ready > 1 ? '<button class="ui-btn sm primary" data-keepall>' + UI.icon('check') + 'Keep all ' + ready + ' as sorted</button>' : '') + '</div>' : '';
+    }
+    function add(entries) {
+      if (!entries.length) return;
+      var fps = entries.map(function (e) { return e.fp; }).filter(Boolean);
+      (fps.length ? UI.apiQuiet('shots_seen', fps) : Promise.resolve({ seen: [] })).then(function (r) {
+        var seen = r.seen || [];
+        entries.forEach(function (e) {
+          if (e.fp && seen.indexOf(e.fp) >= 0) { hidden.push(e); return; }
+          if (list.some(function (x) { return x.fp && x.fp === e.fp; })) return;
+          enqueue(e);
+        });
+        if (!list.length && hidden.length) UI.toast('You looked at all of these before. Tap Show to see them again.');
+        if (!list.length && !hidden.length) UI.toast('No pictures in that choice.');
+        summary();
+      });
+    }
+    function enqueue(e) {
+      e.key = 'k' + Math.random().toString(36).slice(2); e.status = 'queued'; list.push(e);
+      view.querySelector('[data-shots]').insertAdjacentHTML('beforeend', '<div class="td-shot" data-k="' + e.key + '"></div>');
+      draw(e);
+      queue = queue.then(function () { return read(e); }).catch(function (err) { e.status = 'error'; e.err = err && err.message || 'That one didn\'t work.'; draw(e); summary(); });
+    }
+    function read(e) {
+      e.status = 'reading'; e.step = 'Getting it ready…'; draw(e);
+      return Promise.all([FB.media.shrink(e.file, 1600), FB.media.exif(e.file)]).then(function (r) {
+        e.shot = r[0].dataUrl; e.exif = r[1]; draw(e);
+        if (!view.querySelector('[data-ocr]') || !view.querySelector('[data-ocr]').checked) return '';
+        return FB.media.ocr(e.shot, function (s, p) {
+          var bar = view.querySelector('[data-k="' + e.key + '"] .fv-progress i'); if (bar) bar.style.width = Math.round(p * 100) + '%';
+          var st = view.querySelector('[data-k="' + e.key + '"] .st'); if (st) st.textContent = s === 'recognizing text' ? 'Reading the text…' : 'Getting the reader ready (first time only)…';
+        });
+      }).then(function (text) {
+        e.text = text || ''; e.found = FB.media.extract(e.text);
+        return UI.apiQuiet('shot_sort', e.text, e.name, e.found);
+      }).then(function (s) {
+        e.sort = s; e.title = s.title; e.pick = null; e.useUrl = !!s.url; e.status = 'ready'; e.file = null;
+        draw(e); summary();
+      });
+    }
+    function draw(e) {
+      var el = view.querySelector('[data-k="' + e.key + '"]'); if (!el) return;
+      var img = e.shot ? '<img src="' + e.shot + '" alt="">' : '<div class="ph"></div>';
+      el.className = 'td-shot' + (e.status === 'kept' || e.status === 'later' ? ' done' : e.status === 'skipped' ? ' done skipped' : '');
+      if (e.status === 'queued' || e.status === 'reading') { el.innerHTML = img + '<div class="body"><b>' + esc(e.name) + '</b><div class="st">' + (e.status === 'queued' ? 'Waiting its turn…' : esc(e.step)) + '</div><div class="fv-progress"><i></i></div></div>'; return; }
+      if (e.status === 'error') { el.innerHTML = img + '<div class="body"><b>' + esc(e.name) + '</b><div class="st">' + esc(e.err) + '</div></div>'; return; }
+      if (e.status === 'kept' || e.status === 'later') { el.innerHTML = img + '<div class="body"><span>' + UI.icon('check') + ' <a href="#fave/' + esc(e.fave.id) + '">' + esc(e.fave.title) + '</a> <span class="muted small">' + (e.status === 'kept' ? 'kept in ' + esc(FB.cat(e.fave.cat).emoji + ' ' + FB.cat(e.fave.cat).name) : 'in your inbox') + (e.fave.saved_before ? ' (already saved: added the screenshot)' : '') + '</span></span></div>'; return; }
+      if (e.status === 'skipped') { el.innerHTML = img + '<div class="body"><span class="muted small">Skipped ' + esc(e.title || e.name) + '</span></div>'; return; }
+      var s = e.sort, cat = e.pick || s.cat, found = FB.media.foundCount(e.found);
+      el.innerHTML = img + '<div class="body"><input class="title" type="text" value="' + esc(e.title) + '" data-title aria-label="Title" maxlength="200">' +
+        '<div class="fb-why">' + (s.cat !== 'other' ? FB.catChip(s.cat) + ' ' + pct(s.conf) + ' sure: ' : '') + (s.reasons || []).map(function (x) { return '<span class="fb-tag">' + esc(x) + '</span>'; }).join('') + '</div>' +
+        '<div class="td-cats">' + FB.CATS.map(function (k) { return '<button type="button" class="fb-chip sm' + (k.id === cat ? ' on' : '') + '" data-scat="' + k.id + '">' + k.emoji + ' ' + esc(k.name) + '</button>'; }).join('') + '</div>' +
+        (s.url ? '<label class="ui-check small"><input type="checkbox" data-useurl' + (e.useUrl ? ' checked' : '') + '> Link it to <b>' + esc(s.url.replace(/^https?:\/\//, '').slice(0, 60)) + '</b> (found in it)</label>' : '') +
+        (found ? '<details><summary class="small muted">Found ' + UI.plural(found, 'useful bit') + '</summary>' + FB.media.foundHtml(e.found) + '</details>' : '') +
+        (e.text ? '<div class="td-ocr">' + esc(e.text.slice(0, 400)) + '</div>' : '') +
+        '<div class="acts"><button class="ui-btn primary" data-keep>' + UI.icon('heart') + (cat === 'other' ? 'Keep' : 'Keep in ' + esc(FB.cat(cat).emoji + ' ' + FB.cat(cat).name)) + '</button>' +
+        '<button class="ui-btn" data-later>' + UI.icon('inbox') + 'Later</button><button class="ui-btn ghost" data-skip>' + UI.icon('x') + 'Skip</button></div></div>';
+    }
+    function entryOf(el) { var k = el.closest('[data-k]'); return k && list.find(function (x) { return x.key === k.getAttribute('data-k'); }); }
+    function keep(e, later, btn) {
+      var t = view.querySelector('[data-k="' + e.key + '"] [data-title]');
+      if (t) e.title = t.value.trim() || e.title;
+      var cat = e.pick || e.sort.cat;
+      var f = { photo: e.drop_id ? null : e.shot, drop_id: e.drop_id || null, title: e.title, category: later || cat === 'other' ? null : cat, ocr: e.text, found: e.found,
+        exif: e.exif || {}, url: e.useUrl ? e.sort.url : null, fp: e.fp || null, source: e.drop_id ? 'share' : 'screenshot' };
+      return UI.busy(btn, UI.apiQuiet('shot_save', f)).then(function (r) {
+        e.fave = Object.assign(r.fave, { saved_before: !r.created }); e.status = later || cat === 'other' ? 'later' : 'kept'; draw(e); summary();
+      }, function (err) { UI.toast(err.message || 'Couldn\'t save that one.', 'error'); });
+    }
+    function skip(e) {
+      e.status = 'skipped'; draw(e); summary();
+      UI.apiQuiet('shots_skip', e.fp ? [e.fp] : [], e.drop_id ? [e.drop_id] : []).catch(function () {});
+    }
+    function fromFolder(handle, ask) {
+      var perm = handle.queryPermission ? handle.queryPermission({ mode: 'read' }) : Promise.resolve('granted');
+      return perm.then(function (p) { return p === 'granted' || !ask ? p : handle.requestPermission({ mode: 'read' }); }).then(function (p) {
+        if (p !== 'granted') throw Object.assign(new Error('Faves Buddy needs permission to look in that folder.'), { uiApi: true });
+        var files = [], it = handle.values(), step = function () {
+          return it.next().then(function (n) {
+            if (n.done) return files;
+            if (n.value.kind === 'file' && IMG.test(n.value.name)) return n.value.getFile().then(function (f) { files.push(f); return step(); });
+            return step();
+          });
+        };
+        return step();
+      }).then(function (files) {
+        files.sort(function (a, b) { return b.lastModified - a.lastModified; });
+        UI.toast(UI.plural(files.length, 'picture') + ' in “' + handle.name + '”. Showing the newest ones you haven\'t looked at.');
+        add(files.slice(0, 120).map(function (f) { return { file: f, name: f.name, fp: fpOf(f) }; }));
+      });
+    }
+
+    view.addEventListener('change', function (ev) {
+      if (ev.target.matches('[data-files]')) {
+        var files = Array.prototype.slice.call(ev.target.files || []).filter(function (f) { return /^image\//.test(f.type) || IMG.test(f.name); });
+        add(files.map(function (f) { return { file: f, name: f.name, fp: fpOf(f) }; }));
+        ev.target.value = '';
+      }
+      if (ev.target.matches('[data-ocr]')) UI.store.set('tidy.ocr', ev.target.checked);
+      if (ev.target.matches('[data-useurl]')) { var e = entryOf(ev.target); if (e) e.useUrl = ev.target.checked; }
+    });
+    view.addEventListener('input', function (ev) { if (ev.target.matches('[data-title]')) { var e = entryOf(ev.target); if (e) e.title = ev.target.value; } });
+    view.addEventListener('click', function (ev) {
+      var b = ev.target.closest('button'); if (!b || !view.contains(b)) return;
+      var e = entryOf(b);
+      if (b.hasAttribute('data-scat') && e) { e.pick = b.getAttribute('data-scat'); var t = view.querySelector('[data-k="' + e.key + '"] [data-title]'); if (t) e.title = t.value; draw(e); return; }
+      if (b.hasAttribute('data-keep') && e) { keep(e, false, b); return; }
+      if (b.hasAttribute('data-later') && e) { keep(e, true, b); return; }
+      if (b.hasAttribute('data-skip') && e) { skip(e); return; }
+      if (b.hasAttribute('data-keepall')) {
+        var ready = list.filter(function (x) { return x.status === 'ready'; });
+        UI.busy(b, ready.reduce(function (p, x) { return p.then(function () { return keep(x, false); }); }, Promise.resolve())).then(function () { UI.toast(UI.plural(ready.length, 'screenshot') + ' kept.', 'ok'); });
+        return;
+      }
+      if (b.hasAttribute('data-showhidden')) { var h = hidden; hidden = []; h.forEach(enqueue); summary(); return; }
+      if (b.hasAttribute('data-forget')) { UI.api('shots_forget').then(function () { seenLine(0); UI.toast('Next time, every screenshot shows again.', 'ok'); }); return; }
+      if (b.hasAttribute('data-folder')) {
+        window.showDirectoryPicker({ id: 'fb-shots', mode: 'read', startIn: 'pictures' }).then(function (hd) {
+          folder = hd; idb.set('shots.folder', hd); folderBox(); return fromFolder(hd, false);
+        }).catch(function (err) { if (err && err.name !== 'AbortError') UI.toast(err.message || 'Couldn\'t open that folder.', 'error'); });
+        return;
+      }
+      if (b.hasAttribute('data-recheck') && folder) { fromFolder(folder, true).catch(function (err) { UI.toast(err.message || 'Couldn\'t open that folder.', 'error'); }); }
+    });
+
+    frame();
+    return FB.boot().then(function () {
+      if (incoming && incoming.photos && incoming.photos.length && !incoming.photosTaken) {
+        incoming.photosTaken = true;
+        incoming.photos.forEach(function (p) {
+          var e = { name: p.name || 'Shared picture', drop_id: p.id, fp: null };
+          e.file = null;
+          e.load = fetch(p.image).then(function (r) { return r.blob(); });
+          e.key = null;
+          enqueueDrop(e);
+        });
+      }
+    });
+    function enqueueDrop(e) {
+      e.key = 'k' + Math.random().toString(36).slice(2); e.status = 'queued'; list.push(e);
+      view.querySelector('[data-shots]').insertAdjacentHTML('beforeend', '<div class="td-shot" data-k="' + e.key + '"></div>');
+      draw(e); summary();
+      queue = queue.then(function () { return e.load.then(function (blob) { e.file = blob; return read(e); }); })
+        .catch(function (err) { e.status = 'error'; e.err = err && err.message || 'That shared picture couldn\'t be opened.'; draw(e); summary(); });
+    }
+  }
+
+  /* ------------------------------------------------------------------ pages */
+  UI.page('tidy', { title: 'Tidy up', auth: 'user' }, function (view, ctx) {
+    var mode = ctx.args[0];
+    if (mode === 'tabs') return tabsMode(view);
+    if (mode === 'shots') return shotsMode(view);
+    return hub(view);
+  });
+
+  UI.page('share', { title: 'Shared with Faves Buddy', auth: 'user' }, function (view, ctx) {
+    var code = ctx.args[0] || '';
+    view.innerHTML = '<div class="ui-wrap td-wrap"><div class="ui-skel" style="height:220px;margin-top:30px"></div></div>';
+    return UI.apiQuiet('drop_open', code).then(function (r) {
+      incoming = r;
+      if (r.links.length) { UI.store.set('tidy.tabs', null); setTimeout(function () { UI.go('tidy', 'tabs'); }); return; }
+      if (r.photos.length) { setTimeout(function () { UI.go('tidy', 'shots'); }); return; }
+      var lines = (r.note || '').split('\n'), title = lines[0].slice(0, 200), rest = lines.slice(1).join('\n').trim();
+      view.innerHTML = '<div class="ui-wrap td-wrap" style="max-width:640px"><div class="ui-page-head"><div><h1>Save this?</h1><p class="muted">You shared some text with Faves Buddy.</p></div></div>' +
+        '<form class="fb-panel ui-stack" data-noteform><label class="ui-field"><span>Title</span><input name="title" maxlength="200" required value="' + esc(title) + '"></label>' +
+        '<label class="ui-field"><span>Details</span><textarea name="note" rows="5" maxlength="4000">' + esc(rest) + '</textarea></label>' +
+        '<div class="ui-row end"><button type="button" class="ui-btn ghost" data-drop-no>Don\'t save</button><button class="ui-btn primary" type="submit">' + UI.icon('heart') + 'Save as a note</button></div></form></div>';
+      view.querySelector('[data-noteform]').addEventListener('submit', function (e) {
+        e.preventDefault();
+        var v = UI.formData(e.target);
+        UI.busy(e.target.querySelector('[type=submit]'), UI.api('save_fave', { title: v.title, note: v.note, kind: 'note', source: 'share' })).then(function (s) {
+          UI.apiQuiet('drop_discard', code); var c = FB.cat(s.fave.cat); UI.toast('Saved as ' + c.emoji + ' ' + c.name, 'ok'); UI.go('fave', s.fave.id);
+        });
+      });
+      view.querySelector('[data-drop-no]').addEventListener('click', function () { UI.apiQuiet('drop_discard', code).then(function () { UI.go('tidy'); }); });
+    }, function (err) {
+      view.innerHTML = '<div class="ui-wrap td-wrap"><div class="fb-panel td-done"><div class="big">🤷</div><h2>Nothing to tidy here</h2><p class="muted">' + esc(err.message || 'That share has already been tidied, or it expired.') + '</p>' +
+        '<a class="ui-btn primary" href="#tidy" data-go="tidy">Tidy up</a></div></div>';
+    });
+  });
+
+  /* The hub's buttons that live outside a mode (install, discard). */
+  document.addEventListener('click', function (e) {
+    var ins = e.target.closest('[data-install]');
+    if (ins && window.fbInstallPrompt) {
+      window.fbInstallPrompt.prompt();
+      window.fbInstallPrompt.userChoice.then(function (c) { if (c.outcome === 'accepted') { UI.toast('Installed. Faves Buddy is now in your share menu.', 'ok'); ins.remove(); } });
+      window.fbInstallPrompt = null;
+    }
+    var d = e.target.closest('[data-discard]');
+    if (d) UI.confirm({ title: 'Throw this shared pile away?', ok: 'Throw away', danger: true }).then(function (yes) {
+      if (yes) UI.api('drop_discard', d.getAttribute('data-discard')).then(function () { d.closest('.td-wait-row').remove(); });
+    });
+  });
+})();
+
 /* ===== tools.html ===== */
 (function () {
   var esc = UI.esc, TM_KEY = 'favesbuddy.tm';
-  var SECS = [['extension', 'Browser extension', 'puzzle'], ['import', 'Import', 'upload'], ['export', 'Export', 'download'], ['ai', 'AI (your key)', 'wand'],
+  var SECS = [['extension', 'Browser extension', 'puzzle'], ['phone', 'On your phone', 'phone'], ['import', 'Import', 'upload'], ['export', 'Export', 'download'], ['ai', 'AI (your key)', 'wand'],
               ['events', 'Events key', 'ticket'], ['home', 'Home spot', 'pin'], ['learned', 'What it learned', 'sparkle'], ['samples', 'Sample faves', 'grid']];
 
   /* ---------------------------------------------------------------- import parsers (all in the browser) */
@@ -2947,9 +3547,23 @@
           '<p class="muted small" style="margin-top:12px">GeoJSON opens in Google My Maps, QGIS or uMap. The bookmarks file imports into any browser, with a folder per category.</p></div>';
         return Promise.resolve();
       },
+      phone: function () {
+        box.innerHTML = '<div class="fb-panel"><h2>Faves Buddy on your phone</h2><p class="muted">Open Faves Buddy in your phone’s browser and sign in. Then:</p>' +
+          '<ul class="ui-stack" style="padding-left:20px"><li><b>Android:</b> install it (Chrome menu ⋮ → <b>Add to Home screen</b>). It then appears in the share sheet: share a pile of Chrome tabs (tab switcher → <b>Select tabs</b> → ⋮ → <b>Share tabs</b>) or a batch of screenshots from Photos, and swipe through them here.</li>' +
+          '<li><b>iPhone:</b> Safari <b>Share → Add to Home Screen</b>. For tabs, use Safari’s <b>Copy N Links</b> and paste them in <b>Tidy my open tabs</b>; for screenshots, pick a batch in <b>Sweep my screenshots</b>.</li>' +
+          '<li><b>From a computer:</b> the Chrome extension lists the tabs open on your phone’s Chrome (with Chrome sync on) under <b>Tabs on your other devices</b>, ready to sort here.</li></ul>' +
+          '<div class="ui-row" style="margin-top:14px"><a class="ui-btn primary" href="#tidy" data-go="tidy">' + UI.icon('wand') + 'Open Tidy up</a>' +
+          '<button class="ui-btn" data-copy-link>' + UI.icon('copy') + 'Copy the app’s address</button></div></div>';
+        return Promise.resolve();
+      },
       ai: function () {
-        var a = FB.ai.get();
-        box.innerHTML = '<div class="fb-panel"><h2>AI with your own key</h2><p class="muted">Faves Buddy sorts everything without AI. With your own Anthropic API key, it can also describe pictures and screenshots: what they show, the places and dates in them, a better title. ' +
+        var a = FB.ai.get(), s = FB.aiSort || {};
+        var sortBlock = '<div class="fb-panel" style="margin-bottom:18px"><div class="ui-row" style="justify-content:space-between"><h2 style="margin:0">AI second opinion for sorting</h2><span class="ui-badge brand">In progress</span></div>' +
+          '<p class="muted">The sorter works without AI. When this is on, the items it isn’t sure about get a second opinion from Claude in your inbox, with a one-line reason. It only suggests; you still choose. ' +
+          'Only the title, the website, the link’s path and a short bit of text go to Anthropic (no pictures). This uses the app’s own key, not yours.</p>' +
+          (s.available ? '<label class="ui-check"><input type="checkbox" data-aisort' + (s.on ? ' checked' : '') + '> Ask the AI about items the sorter isn’t sure of</label>'
+            : '<p class="ui-note">' + UI.icon('clock') + ' Coming soon: this is built and being switched on. Nothing is sent to any AI until it is, and you’ll opt in here.</p>') + '</div>';
+        box.innerHTML = sortBlock + '<div class="fb-panel"><h2>AI with your own key</h2><p class="muted">Faves Buddy sorts everything without AI. With your own Anthropic API key, it can also describe pictures and screenshots: what they show, the places and dates in them, a better title. ' +
           'The key is stored only in this browser and sent only to Anthropic; our server never sees it or your pictures\' AI requests. You pay Anthropic directly (usually a fraction of a cent per picture).</p>' +
           '<form class="ui-stack" data-aiform style="margin-top:12px"><label class="ui-field"><span>Anthropic API key</span><input type="password" name="key" autocomplete="off" placeholder="sk-ant-…" value="' + esc(a.key || '') + '"></label>' +
           '<label class="ui-field"><span>Model</span><select name="model">' + FB.ai.MODELS.map(function (mm) { return '<option value="' + mm[0] + '"' + (FB.ai.model() === mm[0] ? ' selected' : '') + '>' + mm[1] + ': ' + esc(mm[2]) + '</option>'; }).join('') + '</select></label>' +
@@ -3045,6 +3659,7 @@
     }
     view.addEventListener('click', function (e) {
       var t = e.target;
+      if (t.closest('[data-copy-link]')) FB.copy(location.origin + '/', 'Address copied. Open it on your phone.');
       if (t.closest('[data-copy-code]')) FB.copy(box.querySelector('[data-code]').textContent, 'Code copied. Paste it in the extension.');
       if (t.closest('[data-rotate]')) UI.confirm({ title: 'Make a new code?', text: 'Browsers using the old code will be disconnected until you paste the new one.', ok: 'New code' })
         .then(function (y) { if (y) UI.api('rotate_clip_token').then(function (r) { box.querySelector('[data-code]').textContent = r.code; UI.toast('New code made', 'ok'); }); });
@@ -3072,7 +3687,13 @@
       if (t.closest('[data-samples-load]')) UI.busy(t.closest('button'), UI.api('load_samples')).then(function (r) { UI.toast(r.added ? r.added + ' sample faves added' : 'Samples are already there', 'ok'); });
       if (t.closest('[data-samples-remove]')) UI.busy(t.closest('button'), UI.api('remove_samples')).then(function (r) { UI.toast(UI.plural(r.removed, 'sample') + ' removed', 'ok'); });
     });
-    view.addEventListener('change', function (e) { if (e.target.matches('[data-file]') && e.target.files[0]) readFile(e.target.files[0]); });
+    view.addEventListener('change', function (e) {
+      if (e.target.matches('[data-file]') && e.target.files[0]) readFile(e.target.files[0]);
+      if (e.target.matches('[data-aisort]')) {
+        var on = e.target.checked;
+        UI.api('set_prefs', null, { ai_sort: on }).then(function () { FB.aiSort.on = on; UI.toast(on ? 'AI second opinion on. Your inbox will show its suggestions.' : 'AI second opinion off.', 'ok'); });
+      }
+    });
     view.addEventListener('submit', function (e) {
       e.preventDefault();
       var f = e.target;

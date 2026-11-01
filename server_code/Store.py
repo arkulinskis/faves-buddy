@@ -29,7 +29,7 @@ STAGES = ("", "want", "been", "loved")
 MAX_PHOTO = 3 * 1024 * 1024
 META_KEYS = ("description", "image", "site_name", "og_type", "schema", "lang", "read_min", "address", "startDate", "endDate",
              "priceRange", "servesCuisine", "recipeYield", "totalTime", "entity", "ocr", "ai", "found", "exif", "final_url",
-             "fetch_error", "selection", "favicon", "tags_edited", "fetched", "osm_ref", "suggested_by", "country", "wiki")
+             "fetch_error", "selection", "favicon", "tags_edited", "fetched", "osm_ref", "suggested_by", "country", "wiki", "ai_sort")
 
 
 def token(n=24):
@@ -378,7 +378,7 @@ def fave(row, me=None, lists=None, slim=False):
               "tabset_name": row["tabset"]["name"] if row["tabset"] is not None else None,
               "meta": {k: m.get(k) for k in ("site_name", "og_type", "schema", "lang", "startDate", "endDate", "priceRange",
                                               "servesCuisine", "recipeYield", "totalTime", "entity", "ocr", "ai", "found", "exif",
-                                              "fetch_error", "selection") if m.get(k)}})
+                                              "fetch_error", "selection", "ai_sort") if m.get(k)}})
     if lists is not None:
         d["lists"] = lists
     elif me is not None:

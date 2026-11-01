@@ -16,7 +16,7 @@ from . import Taxonomy as T
 @anvil.server.callable(require_user=True)
 def admin_overview():
     C.require_admin()
-    faves = [f for f in app_tables.faves.search() if not f["is_demo"]]
+    faves = [f for f in app_tables.faves.search() if not f["is_demo"] and f["status"] != "drop"]
     week = C.now() - dt.timedelta(days=7)
     return {"users": len([u for u in app_tables.users.search() if not u["is_demo"]]),
             "admins": len(app_tables.users.search(is_admin=True)),
