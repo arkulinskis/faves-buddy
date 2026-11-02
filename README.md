@@ -12,7 +12,7 @@ open data, and lists can be shared with a link or with people. A Chrome extensio
 ## What it does
 
 **For visitors:** a landing page (promise, how it works, features, FAQ) that links to two public demo lists
-("Peek at a shared list"); any shared list opens without an account (`#s/<token>`); sign-up with email and password;
+("Peek at a shared list"); any shared list opens without an account (`#s/<token>`); sign-up with email and password or Google;
 feedback form; Privacy & Terms.
 
 **For members:**
@@ -94,7 +94,7 @@ title words. Confidence = top / (top + second + 2). Research on 2026-10-31: 35/3
 ## Setting it up in Anvil (once)
 
 1. In the Anvil editor: **Create app → Clone from GitHub**, and paste `https://github.com/arkulinskis/faves-buddy`.
-2. **Users** service: email + password, sign-up allowed (already set in `anvil.yaml`; check it).
+2. **Users** service: email + password and "Continue with Google", sign-up allowed (already set in `anvil.yaml`; check it).
 3. Open the app in the editor. If it shows a **Schema Mismatch** alert, choose **"The schema of the source code is correct"** so Anvil creates the tables.
 4. **Run** it and sign up with **arkulinskis@gmail.com** straight away (that account becomes the admin).
 5. **Publish** (Publish → public URL, or your own domain).
