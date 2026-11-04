@@ -1,0 +1,24 @@
+<anvil-form layout="Faves_Buddy.Layouts.Shell">
+  <anvil-block slot="content">
+    <div class="ui-wrap">
+      <div anvil:name="found_part">
+        <div class="sh-hero">
+          <span class="em" anvil:name="em" anvil:dom-node="em"></span>
+          <div>
+            <span class="eyebrow" anvil:dom-node="by"></span>
+            <anvil-component type="Label" name="name" prop:role='["page-title"]'></anvil-component>
+            <anvil-component type="Label" name="desc" prop:role='["fine-print"]'></anvil-component>
+            <anvil-component type="Label" name="counts" prop:role='["fine-print"]'></anvil-component>
+          </div>
+        </div>
+        <anvil-component type="Faves_Buddy.Components.MapView" name="map" prop:role='["sh-map"]'></anvil-component>
+        <anvil-component type="RepeatingPanel" name="grid" prop:item_template="Faves_Buddy.Items.FaveCard" prop:role='["fb-grid"]'></anvil-component>
+        <div class="sh-cta" anvil:name="cta">
+          <div><h3>Keep your own favourites like this</h3><p class="muted">Save tabs, map pins and screenshots; they're sorted for you. Free.</p></div>
+          <a class="ui-btn primary" href="#auth/signup">Make your own, free</a>
+        </div>
+      </div>
+      <div class="ui-empty" anvil:name="missing"><i class="ic ic-lock"></i><h3>This list isn't available</h3><anvil-component type="Label" name="missing_text"></anvil-component><a class="ui-btn primary" href="#landing">About Faves Buddy</a></div>
+    </div>
+  </anvil-block>
+</anvil-form>

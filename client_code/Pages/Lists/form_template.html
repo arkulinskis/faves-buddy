@@ -1,0 +1,15 @@
+<anvil-form layout="Faves_Buddy.Layouts.Shell">
+  <anvil-block slot="content">
+    <div class="ui-wrap">
+      <div class="ui-page-head">
+        <div><h1>Lists</h1><p class="muted">Group faves your way, then share them with a link or with people.</p></div>
+        <anvil-component type="Button" name="new_button" prop:text="New list" prop:role='["btn", "btn-primary", "ic-plus"]'></anvil-component>
+      </div>
+      <anvil-component type="RepeatingPanel" name="mine" prop:item_template="Faves_Buddy.Items.ListTile" prop:role='["ls-grid"]'></anvil-component>
+      <div anvil:name="shared_part">
+        <div class="fb-section"><h2>Shared with you</h2></div>
+        <anvil-component type="RepeatingPanel" name="shared" prop:item_template="Faves_Buddy.Items.ListTile" prop:role='["ls-grid"]'></anvil-component>
+      </div>
+    </div>
+  </anvil-block>
+</anvil-form>

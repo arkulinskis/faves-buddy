@@ -1,0 +1,81 @@
+---
+layout_metadata:
+  title: App frame
+  description: Header with the menu, Save button and account menu, the page in the middle, the footer and the phone tab bar
+---
+<div class="ui ui-shell">
+  <header class="ui-header">
+    <div class="ui-header-in">
+      <a class="ui-brand" anvil:name="brand" href="#landing" aria-label="Faves Buddy home">
+        <img src="_/theme/icon.svg" alt="" width="32" height="32"><span>Faves Buddy</span>
+      </a>
+      <nav class="ui-nav" aria-label="Main" anvil:name="nav">
+        <anvil-component type="RepeatingPanel" name="nav_panel" prop:item_template="Faves_Buddy.Items.NavLink" prop:role='["contents"]'></anvil-component>
+      </nav>
+      <div class="ui-header-right">
+        <div class="ui-row" anvil:name="guest_actions">
+          <a class="ui-btn ghost" href="#auth">Sign in</a>
+          <a class="ui-btn primary" href="#auth/signup">Get started</a>
+        </div>
+        <div class="ui-row fb-member-actions" anvil:name="member_actions">
+          <a class="ui-btn primary fb-save-btn" href="#add"><i class="ic ic-plus"></i><span>Save</span></a>
+          <anvil-component type="Button" name="avatar_button" prop:role='["avatar"]' prop:tooltip="Your account"></anvil-component>
+          <div class="ui-menu" anvil:name="menu">
+            <div class="ui-menu-head">
+              <anvil-component type="Label" name="menu_name" prop:role='["menu-name"]'></anvil-component>
+              <anvil-component type="Label" name="menu_email" prop:role='["menu-email"]'></anvil-component>
+            </div>
+            <a href="#lists"><i class="ic ic-grid"></i>Your lists</a>
+            <a href="#tidy"><i class="ic ic-wand"></i>Tidy tabs &amp; screenshots</a>
+            <a href="#tabs"><i class="ic ic-tabs"></i>Saved tab sets</a>
+            <a href="#tools"><i class="ic ic-puzzle"></i>Extension, import &amp; tools</a>
+            <a href="#app"><i class="ic ic-phone"></i>Get the app</a>
+            <a href="#profile"><i class="ic ic-user"></i>Your profile</a>
+            <a href="#admin" anvil:name="admin_link"><i class="ic ic-shield"></i>Admin</a>
+            <div class="ui-menu-block"><span class="small muted">Appearance</span>
+              <div class="ui-seg" role="group" aria-label="Appearance">
+                <button type="button" data-theme-set="auto" anvil:name="theme_auto" anvil:on-dom:click="self.theme_click">Auto</button>
+                <button type="button" data-theme-set="light" anvil:name="theme_light" anvil:on-dom:click="self.theme_click">Light</button>
+                <button type="button" data-theme-set="dark" anvil:name="theme_dark" anvil:on-dom:click="self.theme_click">Dark</button>
+              </div>
+            </div>
+            <button type="button" anvil:on-dom:click="self.feedback_click"><i class="ic ic-chat"></i>Submit feedback</button>
+            <button type="button" data-lk-open="overview"><i class="ic ic-lock"></i>Privacy &amp; Terms</button>
+            <button type="button" anvil:on-dom:click="self.sign_out_click"><i class="ic ic-logout"></i>Sign out</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="ui-main">
+    <anvil-slot name="content"></anvil-slot>
+  </main>
+
+  <footer class="ui-footer">
+    <div class="ui-footer-in">
+      <div class="ui-footer-brand">
+        <a class="ui-brand" href="#landing"><img src="_/theme/icon.svg" alt="" width="32" height="32"><span>Faves Buddy</span></a>
+        <p class="muted small">Tabs, pins, screenshots and ideas: sorted, mapped and shared.</p>
+      </div>
+      <div class="ui-footer-links">
+        <a href="#landing">About</a>
+        <a href="#app">Get the app</a>
+        <a href="#tools" anvil:name="ext_link">Browser extension</a>
+        <a href="https://prepsto.com/#f/vef7qyr" target="_blank" rel="noopener" data-prepsto-open>Submit feedback</a>
+        <button type="button" data-lk-open="overview">Privacy &amp; Terms</button>
+      </div>
+      <div class="ui-footer-legal">
+        <anvil-component type="Label" name="copyright_label" prop:text="© Faves Buddy" prop:role='["fine-print"]'></anvil-component>
+      </div>
+    </div>
+  </footer>
+
+  <nav class="ui-tabbar" aria-label="Main" anvil:name="tabbar">
+    <a href="#home" anvil:name="tab_home"><i class="ic ic-heart"></i><span>Faves</span></a>
+    <a href="#inbox" anvil:name="tab_inbox"><i class="ic ic-inbox"></i><span>Inbox</span><i class="fb-tab-dot" anvil:name="inbox_dot"></i></a>
+    <a href="#add" class="fb-tab-add" anvil:name="tab_add" aria-label="Save something"><i class="ic ic-plus"></i></a>
+    <a href="#map" anvil:name="tab_map"><i class="ic ic-map"></i><span>Map</span></a>
+    <a href="#discover" anvil:name="tab_discover"><i class="ic ic-compass"></i><span>Discover</span></a>
+  </nav>
+</div>

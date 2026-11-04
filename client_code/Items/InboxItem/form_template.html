@@ -1,0 +1,32 @@
+<div class="ib-item-host"><article class="ib-item" anvil:name="box" tabindex="-1">
+  <anvil-component type="Faves_Buddy.Components.Cover" name="cover"></anvil-component>
+  <div class="ib-main">
+    <h3><a anvil:name="title_link" anvil:dom-node="title" href="#inbox"></a></h3>
+    <div class="fb-sub"><i class="ic" anvil:name="sub_icon"></i><span anvil:dom-node="sub"></span><span anvil:name="tabset_part"> · <i class="ic ic-tabs"></i><span anvil:dom-node="tabset"></span></span><span anvil:dom-node="saves"></span></div>
+    <div anvil:name="sorted_part">
+      <div class="ib-sug">
+        <span class="fb-chip on sm ib-sug-chip" anvil:dom-node="sug"></span>
+        <span class="fb-conf" anvil:name="conf_bar"><i anvil:dom-node="conf_fill"></i></span>
+        <span class="muted small" anvil:dom-node="conf_text"></span>
+      </div>
+      <div class="fb-why" anvil:name="why_part">Why: <anvil-component type="RepeatingPanel" name="why_panel" prop:item_template="Faves_Buddy.Items.Reason" prop:role='["contents"]'></anvil-component></div>
+    </div>
+    <div class="fb-why" anvil:name="reading_part"><i class="ic ic-refresh"></i> Reading this page…</div>
+    <div class="ib-ai" anvil:name="ai_part"><i class="ic ic-sparkle"></i><span><b anvil:dom-node="ai_cat"></b><span anvil:dom-node="ai_why"></span></span>
+      <anvil-component type="Button" name="ai_button" prop:text="Use this" prop:role='["btn", "btn-sm"]'></anvil-component></div>
+    <anvil-component type="RepeatingPanel" name="tags" prop:item_template="Faves_Buddy.Items.Tag" prop:role='["fb-tags"]'></anvil-component>
+    <div class="ib-actions">
+      <anvil-component type="Button" name="keep_button" prop:text="Keep" prop:role='["btn", "btn-primary", "btn-sm", "ic-check"]'></anvil-component>
+      <anvil-component type="Button" name="change_button" prop:text="Change" prop:role='["btn", "btn-sm", "ic-tag"]'></anvil-component>
+      <anvil-component type="Button" name="lists_button" prop:text="Add to lists" prop:tooltip="Add to lists" prop:role='["btn", "btn-sm", "btn-icon", "ic-grid"]'></anvil-component>
+      <anvil-component type="Button" name="snooze_button" prop:text="Remind me later" prop:tooltip="Remind me later" prop:role='["btn", "btn-sm", "btn-icon", "ic-snooze"]'></anvil-component>
+      <anvil-component type="Button" name="archive_button" prop:text="Archive" prop:tooltip="Archive" prop:role='["btn", "btn-sm", "btn-icon", "ic-archive"]'></anvil-component>
+      <anvil-component type="Button" name="delete_button" prop:text="Delete" prop:tooltip="Delete" prop:role='["btn", "btn-sm", "btn-icon", "btn-danger", "ic-trash"]'></anvil-component>
+      <a class="ui-btn sm ghost" anvil:name="open_link" target="_blank" rel="noopener"><i class="ic ic-external"></i><span class="lbl">Open</span></a>
+    </div>
+    <div class="ib-pick" anvil:name="picker_part">
+      <p class="small muted ib-pick-q">Where does it belong? Faves Buddy will remember for next time.</p>
+      <anvil-component type="Faves_Buddy.Components.CatPicker" name="picker"></anvil-component>
+    </div>
+  </div>
+</article></div>

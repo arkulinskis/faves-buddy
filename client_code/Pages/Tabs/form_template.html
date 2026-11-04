@@ -1,0 +1,9 @@
+<anvil-form layout="Faves_Buddy.Layouts.Shell">
+  <anvil-block slot="content">
+    <div class="ui-wrap tb-wrap">
+      <div class="ui-page-head"><div><h1>Tab sets</h1><p class="muted">Whole windows of tabs you saved at once. Close the tabs with a clear mind: they're all here, sorted.</p></div></div>
+      <anvil-component type="RepeatingPanel" name="sets" prop:item_template="Faves_Buddy.Items.TabSet" prop:role='["tb-sets"]'></anvil-component>
+      <div class="ui-empty" anvil:name="empty"><i class="ic ic-tabs"></i><h3>No tab sets yet</h3><p>With the Chrome extension, “Save all tabs in this window” puts a whole window here in one click.</p><a class="ui-btn primary" href="#tools"><i class="ic ic-puzzle"></i>Get the extension</a></div>
+    </div>
+  </anvil-block>
+</anvil-form>

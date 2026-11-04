@@ -1,0 +1,14 @@
+<article class="fb-card dc-card">
+  <anvil-component type="Faves_Buddy.Components.Cover" name="cover" prop:pills="true"></anvil-component>
+  <div class="fb-card-body">
+    <h3 anvil:dom-node="title"></h3>
+    <div class="fb-sub" anvil:name="sub_row"><span anvil:dom-node="sub"></span></div>
+    <div class="fb-sub small" anvil:dom-node="meta"></div>
+    <div class="dc-why" anvil:name="why" anvil:dom-node="why_t"></div>
+  </div>
+  <div class="fb-actions">
+    <anvil-component type="Button" name="save_button" prop:text="Save" prop:role='["btn", "btn-sm", "btn-primary", "ic-heart"]'></anvil-component>
+    <a class="ui-btn sm" anvil:name="look_link" target="_blank" rel="noopener"><i class="ic ic-external"></i>Look</a>
+    <a class="ui-btn sm" anvil:name="map_link" target="_blank" rel="noopener"><i class="ic ic-map"></i>Map</a>
+  </div>
+</article>

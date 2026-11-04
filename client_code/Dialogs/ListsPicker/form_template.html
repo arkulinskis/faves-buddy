@@ -1,0 +1,13 @@
+<div class="ui fb-dialog">
+  <h2 class="dlg-h">Add to lists</h2>
+  <anvil-component type="RepeatingPanel" name="lists_panel" prop:item_template="Faves_Buddy.Items.ListCheck" prop:role='["fb-lists-pick"]'></anvil-component>
+  <p class="muted" anvil:name="none">No lists yet. Make one below.</p>
+  <div class="ui-row fb-new-list">
+    <anvil-component type="TextBox" name="new_box" prop:placeholder="New list, e.g. Brunch spots" prop:role='["grow-box"]'></anvil-component>
+    <anvil-component type="Button" name="create_button" prop:text="Create" prop:role='["btn", "ic-plus"]'></anvil-component>
+  </div>
+  <div class="ui-row end">
+    <anvil-component type="Button" name="cancel_button" prop:text="Cancel" prop:role='["btn", "btn-ghost"]'></anvil-component>
+    <anvil-component type="Button" name="save_button" prop:text="Save" prop:role='["btn", "btn-primary"]'></anvil-component>
+  </div>
+</div>

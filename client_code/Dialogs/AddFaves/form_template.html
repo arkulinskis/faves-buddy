@@ -1,0 +1,10 @@
+<div class="ui fb-dialog">
+  <anvil-component type="Label" name="heading" prop:role='["dlg-title"]'></anvil-component>
+  <anvil-component type="TextBox" name="filter_box" prop:type="search" prop:placeholder="Filter your faves" prop:role='["lv-filter"]'></anvil-component>
+  <anvil-component type="RepeatingPanel" name="rows" prop:item_template="Faves_Buddy.Items.ListCheck" prop:role='["lv-add-list"]'></anvil-component>
+  <p class="muted" anvil:name="none">All your faves are already on this list.</p>
+  <div class="ui-row end">
+    <anvil-component type="Button" name="cancel_button" prop:text="Cancel" prop:role='["btn", "btn-ghost"]'></anvil-component>
+    <anvil-component type="Button" name="add_button" prop:text="Add" prop:role='["btn", "btn-primary"]'></anvil-component>
+  </div>
+</div>

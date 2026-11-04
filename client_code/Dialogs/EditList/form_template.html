@@ -1,0 +1,14 @@
+<div class="ui fb-dialog">
+  <anvil-component type="Label" name="heading" prop:text="New list" prop:role='["dlg-title"]'></anvil-component>
+  <div class="ui-stack">
+    <label class="ui-field"><span>Name</span><anvil-component type="TextBox" name="name_box" prop:placeholder="e.g. Brunch spots, Rainy day ideas"></anvil-component></label>
+    <div class="ui-field"><span>Emoji</span><anvil-component type="RepeatingPanel" name="emojis" prop:item_template="Faves_Buddy.Items.EmojiPick" prop:role='["ls-emojis"]'></anvil-component></div>
+    <div class="ui-field"><span>Colour</span><anvil-component type="RepeatingPanel" name="colors" prop:item_template="Faves_Buddy.Items.ColorPick" prop:role='["ls-colors"]'></anvil-component></div>
+    <label class="ui-field"><span>Description <em>(optional)</em></span><anvil-component type="TextArea" name="desc_box" prop:height="80"></anvil-component></label>
+    <anvil-component type="Label" name="message" prop:role='["msg-error"]' prop:visible="false"></anvil-component>
+    <div class="ui-row end">
+      <anvil-component type="Button" name="cancel_button" prop:text="Cancel" prop:role='["btn", "btn-ghost"]'></anvil-component>
+      <anvil-component type="Button" name="save_button" prop:text="Create list" prop:role='["btn", "btn-primary"]'></anvil-component>
+    </div>
+  </div>
+</div>

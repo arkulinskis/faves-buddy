@@ -1,0 +1,25 @@
+<div class="ui fb-dialog">
+  <anvil-component type="Label" name="heading" prop:role='["dlg-title"]'></anvil-component>
+  <div class="ui-card flat sh-block">
+    <div class="ui-row between">
+      <div><b>Public link</b><div class="muted small">Anyone with the link can see this list. No sign-in needed. Notes and emails stay private.</div></div>
+      <anvil-component type="CheckBox" name="public_box" prop:text="On"></anvil-component>
+    </div>
+    <div class="ui-row sh-link" anvil:name="link_row">
+      <anvil-component type="TextBox" name="link_box" prop:role='["grow-box"]'></anvil-component>
+      <anvil-component type="Button" name="copy_button" prop:text="Copy" prop:role='["btn", "ic-copy"]'></anvil-component>
+    </div>
+  </div>
+  <div class="ui-card flat sh-block">
+    <b>Invite people</b>
+    <div class="muted small">They'll see it under “Shared with you” when they sign in with that email. Editors can add their own faves.</div>
+    <div class="ui-row sh-invite">
+      <anvil-component type="TextBox" name="email_box" prop:type="email" prop:placeholder="friend@example.com" prop:role='["grow-box"]'></anvil-component>
+      <anvil-component type="DropDown" name="role_box"></anvil-component>
+      <anvil-component type="Button" name="invite_button" prop:text="Invite" prop:role='["btn", "btn-primary"]'></anvil-component>
+    </div>
+    <anvil-component type="RepeatingPanel" name="members" prop:item_template="Faves_Buddy.Items.MemberRow" prop:role='["lv-members"]'></anvil-component>
+    <p class="muted small" anvil:name="no_members">Not shared with anyone yet.</p>
+  </div>
+  <div class="ui-row end"><anvil-component type="Button" name="done_button" prop:text="Done" prop:role='["btn", "btn-primary"]'></anvil-component></div>
+</div>

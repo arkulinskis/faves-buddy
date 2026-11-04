@@ -1,0 +1,50 @@
+<anvil-form layout="Faves_Buddy.Layouts.Shell">
+  <anvil-block slot="content">
+    <div class="ui-wrap">
+      <div class="dc-head"><div>
+        <anvil-component type="Label" name="title" prop:text="Discover" prop:role='["page-title"]'></anvil-component>
+        <anvil-component type="Label" name="intro" prop:role='["fine-print", "dc-intro"]'></anvil-component>
+      </div></div>
+      <div class="dc-where">
+        <span class="muted small">Around</span>
+        <anvil-component type="RepeatingPanel" name="centre_chips" prop:item_template="Faves_Buddy.Items.Chip" prop:role='["contents"]'></anvil-component>
+        <span class="muted small dc-within">within</span>
+        <anvil-component type="RepeatingPanel" name="km_chips" prop:item_template="Faves_Buddy.Items.Chip" prop:role='["contents"]'></anvil-component>
+      </div>
+      <nav class="ui-tabs dc-tabs" aria-label="What to discover">
+        <a href="#discover/places" anvil:name="tab_places"><i class="ic ic-pin"></i>Places like yours</a>
+        <a href="#discover/top" anvil:name="tab_top"><i class="ic ic-star"></i>Top faves</a>
+        <a href="#discover/events" anvil:name="tab_events"><i class="ic ic-ticket"></i>Events</a>
+        <a href="#discover/ideas" anvil:name="tab_ideas"><i class="ic ic-book"></i>Ideas &amp; reads</a>
+      </nav>
+
+      <div anvil:name="seeds_part">
+        <anvil-component type="Label" name="seeds_intro" prop:role='["fine-print"]'></anvil-component>
+        <anvil-component type="RepeatingPanel" name="seed_chips" prop:item_template="Faves_Buddy.Items.Chip" prop:role='["dc-seeds"]'></anvil-component>
+      </div>
+      <anvil-component type="RepeatingPanel" name="recipes" prop:item_template="Faves_Buddy.Items.RecipeCard" prop:role='["dc-recipes"]'></anvil-component>
+      <div class="fb-ai-nudge dc-tm" anvil:name="tm_nudge"><i class="ic ic-ticket"></i><span><b>Want concerts, shows and games with dates?</b> Add a free Ticketmaster Discovery API key (5,000 searches a day). It stays in this browser.</span><a class="ui-btn sm" href="#tools/events">Add key</a></div>
+
+      <div class="dc-results">
+        <anvil-component type="Label" name="hint" prop:role='["fine-print", "dc-hint"]'></anvil-component>
+        <div class="ib-progress dc-loading" anvil:name="loading"><i class="ic ic-refresh"></i><anvil-component type="Label" name="loading_text"></anvil-component></div>
+        <anvil-component type="Label" name="error" prop:role='["msg-error"]' prop:visible="false"></anvil-component>
+        <div anvil:name="results_part">
+          <div class="dc-res-head"><anvil-component type="Label" name="res_head" prop:role='["strong"]'></anvil-component><anvil-component type="Label" name="res_count" prop:role='["fine-print"]'></anvil-component></div>
+          <anvil-component type="RepeatingPanel" name="results" prop:item_template="Faves_Buddy.Items.SugCard" prop:role='["fb-grid"]'></anvil-component>
+          <anvil-component type="RepeatingPanel" name="top_results" prop:item_template="Faves_Buddy.Items.TopCard" prop:role='["fb-grid"]'></anvil-component>
+          <div class="ui-empty" anvil:name="no_results"><i class="ic ic-search"></i><h3 anvil:dom-node="none_title">Nothing new found</h3><anvil-component type="Label" name="none_text" prop:text="Try a bigger distance or another spot."></anvil-component></div>
+        </div>
+      </div>
+
+      <div class="fb-panel dc-how-panel">
+        <h3>How suggestions work</h3>
+        <div class="dc-how">
+          <div><b>1. Your taste</b>We look at what you kept: kinds of places (café, park…), cuisines, tags like “terrace” or “vegan”, and where your faves are.</div>
+          <div><b>2. A precise search</b>Each card shows the exact filter we send to OpenStreetMap, Wikipedia or Wikidata. Nothing runs until you tap.</div>
+          <div><b>3. You decide</b>Results you already saved are hidden. Saving one puts it in your inbox, sorted, so it teaches the next search. Top faves count what people save around you, anonymously.</div>
+        </div>
+      </div>
+    </div>
+  </anvil-block>
+</anvil-form>

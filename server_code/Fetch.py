@@ -37,7 +37,7 @@ def _safe(url):
     except Exception:
         raise FetchError("That website couldn't be found.")
     for info in infos:
-        ip = ipaddress.ip_address(info[4][0].split("%")[0])
+        ip = ipaddress.ip_address(str(info[4][0]).split("%")[0])
         if ip.is_private or ip.is_loopback or ip.is_link_local or ip.is_reserved or ip.is_multicast:
             raise FetchError("That address isn't on the public internet.")
 

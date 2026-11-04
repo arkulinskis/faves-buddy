@@ -1,0 +1,29 @@
+---
+custom_component: true
+properties:
+  - name: selected
+    type: string
+    default_value: ""
+    description: The chosen category id
+    default_binding_prop: true
+  - name: small
+    type: boolean
+    default_value: false
+    description: Small chips
+  - name: scroll
+    type: boolean
+    default_value: false
+    description: One scrolling row (phones) instead of wrapping
+events:
+  - name: pick
+    parameters:
+      - name: cat
+toolbox_item:
+  title: Category picker
+  group: Faves Buddy
+help_text: |
+  The 20 categories as chips; the chosen one is pressed in. Raises "pick" with cat when one is clicked.
+---
+<div class="fb-picker-wrap"><div class="fb-picker-host" role="group" aria-label="Category" anvil:name="host">
+  <anvil-component type="RepeatingPanel" name="chips" prop:item_template="Faves_Buddy.Items.Chip" prop:role='["fb-picker"]'></anvil-component>
+</div></div>

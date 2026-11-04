@@ -1,0 +1,61 @@
+<anvil-form layout="Faves_Buddy.Layouts.Shell">
+  <anvil-block slot="content">
+    <div class="ui-wrap ga-wrap">
+      <div class="ga-hero">
+        <img src="_/theme/icon.svg" alt="" width="84" height="84" class="ga-icon">
+        <div>
+          <span class="eyebrow">Android · iPhone · iPad · computer</span>
+          <h1>Get the Faves Buddy app</h1>
+          <p class="muted ga-lead">No app store needed: Faves Buddy installs straight from your browser in a few seconds, opens full screen like any other app, and is always the latest version. On Android it also shows up in your share menu, so tabs and screenshots go straight in.</p>
+          <p class="ok ga-done" anvil:name="installed_note"><i class="ic ic-check"></i> Faves Buddy is already installed on this device. Open it from your home screen.</p>
+        </div>
+      </div>
+
+      <div class="ga-cards">
+        <section class="fb-panel ga-card" anvil:name="card_android">
+          <div class="ga-card-head"><span class="ga-badge">🤖</span><div><h2>Android</h2><p class="muted small">Chrome, Samsung Internet, Edge</p></div><anvil-component type="Label" name="here_android" prop:text="This device" prop:role='["badge", "badge-brand"]'></anvil-component></div>
+          <anvil-component type="Button" name="install_button" prop:text="Install Faves Buddy" prop:role='["btn", "btn-primary", "btn-lg", "btn-block", "ic-download"]'></anvil-component>
+          <ol class="tl-steps ga-steps">
+            <li>Open <b>faves-buddy.anvil.app</b> in Chrome and sign in.</li>
+            <li>Tap <b>Install</b> above, or Chrome's menu <b>⋮ → Add to Home screen → Install</b>.</li>
+            <li>Find <b>Faves Buddy</b> on your home screen. To save a pile of tabs: Chrome's tab switcher → <b>Select tabs</b> → <b>⋮ → Share</b> → <b>Faves Buddy</b>. Screenshots: <b>Share</b> from Photos.</li>
+          </ol>
+        </section>
+
+        <section class="fb-panel ga-card" anvil:name="card_ios">
+          <div class="ga-card-head"><span class="ga-badge">📱</span><div><h2>iPhone &amp; iPad</h2><p class="muted small">Safari (iOS 16.4 and later: also Chrome and Edge)</p></div><anvil-component type="Label" name="here_ios" prop:text="This device" prop:role='["badge", "badge-brand"]'></anvil-component></div>
+          <ol class="tl-steps ga-steps">
+            <li>Open <b>faves-buddy.anvil.app</b> in Safari and sign in.</li>
+            <li>Tap the <b>Share</b> button <span class="ga-share" aria-hidden="true"><i class="ic ic-upload"></i></span> at the bottom (iPad: top right).</li>
+            <li>Scroll down and tap <b>Add to Home Screen</b>, then <b>Add</b>.</li>
+            <li>Open it from your home screen. To bring in tabs, use Safari's <b>Copy N Links</b> and paste them in <a href="#tidy/tabs">Tidy my open tabs</a>; for screenshots, <a href="#tidy/shots">Sweep my screenshots</a>.</li>
+          </ol>
+        </section>
+
+        <section class="fb-panel ga-card" anvil:name="card_desktop">
+          <div class="ga-card-head"><span class="ga-badge">💻</span><div><h2>Computer</h2><p class="muted small">Chrome, Edge, Brave, Arc</p></div><anvil-component type="Label" name="here_desktop" prop:text="This device" prop:role='["badge", "badge-brand"]'></anvil-component></div>
+          <anvil-component type="Button" name="install_desktop_button" prop:text="Install as an app" prop:role='["btn", "btn-primary", "btn-block", "ic-download"]'></anvil-component>
+          <ol class="tl-steps ga-steps">
+            <li>Chrome or Edge: click the <b>install</b> icon at the right end of the address bar (or menu → <b>Save and share → Install</b>).</li>
+            <li>Add the <a href="#tools/extension">Chrome extension</a> to save a tab, or a whole window of tabs, in one click.</li>
+          </ol>
+        </section>
+      </div>
+
+      <div class="fb-panel ga-send">
+        <div><h3>On your computer now?</h3><p class="muted small">Send the link to your phone and install it there.</p></div>
+        <div class="ui-row">
+          <anvil-component type="Button" name="copy_button" prop:text="Copy the link" prop:role='["btn", "ic-copy"]'></anvil-component>
+          <a class="ui-btn" anvil:name="mail_link"><i class="ic ic-mail"></i>Email it to me</a>
+          <a class="ui-btn" anvil:name="sms_link"><i class="ic ic-chat"></i>Text it</a>
+        </div>
+      </div>
+
+      <div class="lp-faq ga-faq">
+        <details><summary>Why isn't it in the App Store or Google Play?</summary><p>Faves Buddy is a web app you install from the browser (a “progressive web app”). It's the same app on every device, it updates itself, it takes almost no space, and your faves are the same everywhere you sign in.</p></details>
+        <details><summary>Does it work offline?</summary><p>It needs a connection to save and sort things, because your collection lives in your account. Pictures you choose are shrunk and their text is read on your device.</p></details>
+        <details><summary>How do I remove it?</summary><p>Like any app: touch and hold its icon and choose Remove (iPhone) or Uninstall (Android). Your faves stay in your account.</p></details>
+      </div>
+    </div>
+  </anvil-block>
+</anvil-form>

@@ -161,7 +161,7 @@ def find_same(owner, url_norm=None, title=None, lat=None, lng=None):
         return app_tables.faves.get(owner=owner, url_norm=url_norm)
     if title and lat is not None:
         for r in app_tables.faves.search(owner=owner, title=title):
-            if r["lat"] is not None and abs(r["lat"] - lat) < 0.0005 and abs(r["lng"] - lng) < 0.0007:
+            if r["lat"] is not None and lng is not None and abs(r["lat"] - lat) < 0.0005 and abs(r["lng"] - lng) < 0.0007:
                 return r
     return None
 

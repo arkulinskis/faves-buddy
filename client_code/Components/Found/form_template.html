@@ -1,0 +1,16 @@
+---
+custom_component: true
+properties:
+  - name: found
+    type: object
+    description: '{urls, emails, phones, dates, times, addresses, handles, prices} found in a picture or a note'
+    default_binding_prop: true
+toolbox_item:
+  title: Found in it
+  group: Faves Buddy
+help_text: |
+  The useful bits read from a picture: links, emails, phone numbers (tap to call), dates, addresses (open the map).
+---
+<div class="fb-found-host">
+  <anvil-component type="RepeatingPanel" name="groups" prop:item_template="Faves_Buddy.Items.FoundGroup"></anvil-component>
+</div>

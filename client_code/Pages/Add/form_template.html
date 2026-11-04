@@ -1,0 +1,81 @@
+<anvil-form layout="Faves_Buddy.Layouts.Shell">
+  <anvil-block slot="content">
+    <div class="ui-wrap ad-box">
+      <div class="ui-page-head"><div><h1>Save something</h1><p class="muted">It's sorted for you. You can always change where it goes.</p></div></div>
+      <div class="ad-tidy"><a class="ui-btn sm" href="#tidy/tabs"><i class="ic ic-tabs"></i>A pile of tabs</a><a class="ui-btn sm" href="#tidy/shots"><i class="ic ic-wand"></i>Sweep screenshots</a></div>
+      <nav class="ui-tabs ad-tabs" aria-label="What to save">
+        <a href="#add/link" anvil:name="tab_link"><i class="ic ic-link"></i>Link</a>
+        <a href="#add/place" anvil:name="tab_place"><i class="ic ic-pin"></i>Place</a>
+        <a href="#add/photo" anvil:name="tab_photo"><i class="ic ic-image"></i>Pictures</a>
+        <a href="#add/note" anvil:name="tab_note"><i class="ic ic-note"></i>Note or idea</a>
+      </nav>
+
+      <div anvil:name="link_part">
+        <div class="ui-row">
+          <anvil-component type="TextBox" name="url_box" prop:type="url" prop:placeholder="https://… (a page, a video, a Google Maps link…)" prop:role='["grow-box"]'></anvil-component>
+          <anvil-component type="Button" name="preview_button" prop:text="Preview" prop:role='["btn", "btn-primary", "ic-eye"]'></anvil-component>
+        </div>
+        <div class="ui-skel ad-skel" anvil:name="preview_wait"></div>
+        <div class="fb-panel ad-preview" anvil:name="preview">
+          <anvil-component type="Faves_Buddy.Components.Cover" name="p_cover"></anvil-component>
+          <div>
+            <anvil-component type="Label" name="p_title" prop:role='["ad-p-title"]'></anvil-component>
+            <div class="fb-sub"><i class="ic" anvil:name="p_icon"></i><span anvil:dom-node="p_sub"></span></div>
+            <anvil-component type="Label" name="p_desc" prop:role='["fine-print", "ad-p-desc"]'></anvil-component>
+            <anvil-component type="Label" name="p_error" prop:role='["ui-hint"]'></anvil-component>
+            <div class="ui-note ad-already" anvil:name="already">You saved this before. Saving again adds your note to it. <a anvil:name="already_link" href="#home">Open it</a></div>
+            <div class="fv-sec"><span class="lbl">Goes in</span>
+              <div class="fb-why"><anvil-component type="Label" name="p_why"></anvil-component><anvil-component type="RepeatingPanel" name="p_reasons" prop:item_template="Faves_Buddy.Items.Reason" prop:role='["contents"]'></anvil-component></div>
+              <div class="fv-picker"><anvil-component type="Faves_Buddy.Components.CatPicker" name="p_picker"></anvil-component></div>
+            </div>
+            <div class="fv-sec" anvil:name="p_lists_part"><span class="lbl">Add to lists</span><anvil-component type="RepeatingPanel" name="p_lists" prop:item_template="Faves_Buddy.Items.Chip" prop:role='["fb-chips"]'></anvil-component></div>
+            <div class="fv-sec"><span class="lbl">Note</span><anvil-component type="TextArea" name="p_note" prop:placeholder="Optional: why you're saving it" prop:height="60"></anvil-component></div>
+            <div class="ui-row ad-save-row">
+              <anvil-component type="Button" name="save_link_button" prop:text="Save" prop:role='["btn", "btn-primary", "btn-lg", "ic-heart"]'></anvil-component>
+              <anvil-component type="Button" name="save_inbox_button" prop:text="Save to inbox for later" prop:role='["btn"]'></anvil-component>
+            </div>
+          </div>
+        </div>
+        <div class="fb-panel ad-bm-panel">
+          <h3>Save from any browser</h3>
+          <p class="muted small">Drag this button to your bookmarks bar. On any page, click it to send the page here. (In Chrome, the <a href="#tools">extension</a> does more: whole windows of tabs at once.)</p>
+          <a class="ad-bookmarklet" anvil:name="bookmarklet" href="#add" anvil:on-dom:click="self.bookmarklet_click"><i class="ic ic-heart"></i>+ Faves Buddy</a>
+        </div>
+      </div>
+
+      <div anvil:name="place_part">
+        <div class="ui-row">
+          <anvil-component type="TextBox" name="place_box" prop:type="search" prop:placeholder="Name of a café, park, shop, address…" prop:role='["grow-box"]'></anvil-component>
+          <anvil-component type="Button" name="place_button" prop:text="Search" prop:role='["btn", "btn-primary", "ic-search"]'></anvil-component>
+        </div>
+        <div class="ui-row ad-here">
+          <anvil-component type="Button" name="here_button" prop:text="Pin where I am now" prop:role='["btn", "ic-locate"]'></anvil-component>
+          <span class="muted small">Or paste a Google Maps link on the Link tab.</span>
+        </div>
+        <anvil-component type="Label" name="place_none" prop:text="Nothing found. Try adding the city." prop:role='["fine-print"]' prop:visible="false"></anvil-component>
+        <anvil-component type="RepeatingPanel" name="places" prop:item_template="Faves_Buddy.Items.PlaceRow" prop:role='["ad-results"]'></anvil-component>
+      </div>
+
+      <div anvil:name="photo_part">
+        <label class="ad-drop" anvil:dom-node="drop"><i class="ic ic-image"></i><b>Drop screenshots and photos here</b><span class="muted small">or tap to choose (several at once is fine). On a phone you can take a photo.</span><input type="file" accept="image/*" multiple hidden anvil:dom-node="files"></label>
+        <anvil-component type="CheckBox" name="ocr_box" prop:text="Read the text in them (on this device, free; the first time downloads about 10 MB)" prop:role='["small-check", "ad-check"]'></anvil-component>
+        <anvil-component type="CheckBox" name="ai_box" prop:text="Also describe them with AI (your key, a fraction of a cent each)" prop:role='["small-check", "ad-check"]'></anvil-component>
+        <anvil-component type="Faves_Buddy.Components.AiNudge" name="ai_nudge" prop:what="describe pictures and spot places in them" prop:role='["ad-nudge"]'></anvil-component>
+        <anvil-component type="RepeatingPanel" name="photos" prop:item_template="Faves_Buddy.Items.PhotoRow" prop:role='["ad-photos"]'></anvil-component>
+      </div>
+
+      <div anvil:name="note_part">
+        <div class="fb-panel ui-stack">
+          <div class="ui-seg" role="group" aria-label="Note or idea">
+            <button type="button" anvil:name="kind_note" data-kind="note" anvil:on-dom:click="self.kind_click">Note</button>
+            <button type="button" anvil:name="kind_idea" data-kind="idea" anvil:on-dom:click="self.kind_click">Idea</button>
+          </div>
+          <label class="ui-field"><span>Title</span><anvil-component type="TextBox" name="n_title" prop:placeholder="e.g. Gift for Sam: a good pocket knife"></anvil-component></label>
+          <label class="ui-field"><span>Details <em>(optional)</em></span><anvil-component type="TextArea" name="n_note" prop:placeholder="Links, who recommended it, what to try…" prop:height="120"></anvil-component></label>
+          <div class="fv-sec" anvil:name="n_lists_part"><span class="lbl">Add to lists</span><anvil-component type="RepeatingPanel" name="n_lists" prop:item_template="Faves_Buddy.Items.Chip" prop:role='["fb-chips"]'></anvil-component></div>
+          <div class="ui-row end"><anvil-component type="Button" name="note_button" prop:text="Save" prop:role='["btn", "btn-primary", "ic-heart"]'></anvil-component></div>
+        </div>
+      </div>
+    </div>
+  </anvil-block>
+</anvil-form>

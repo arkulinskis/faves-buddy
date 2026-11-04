@@ -1,0 +1,140 @@
+<anvil-form layout="Faves_Buddy.Layouts.Shell">
+  <anvil-block slot="content">
+    <div class="ui-wrap td-wrap">
+      <div anvil:name="hub_part">
+        <div class="ui-page-head"><div><h1>Tidy up</h1><p class="muted">Clear a pile in a few minutes. Everything is already sorted for you: say yes, move it, or skip it.</p></div></div>
+        <div class="td-big">
+          <a class="td-job" href="#tidy/tabs"><span class="ic-box"><i class="ic ic-tabs"></i></span><span><h2>Sort my open tabs</h2><anvil-component type="Label" name="tabs_job_text" prop:role='["td-job-text"]'></anvil-component></span></a>
+          <a class="td-job coral" href="#tidy/shots"><span class="ic-box"><i class="ic ic-image"></i></span><span><h2>Sweep my screenshots</h2><p>Pick your screenshots. Their text is read on this device and each one is sorted for you.</p></span></a>
+        </div>
+        <div anvil:name="waiting_part"><h2>Shared with Faves Buddy, still to tidy</h2>
+          <anvil-component type="RepeatingPanel" name="drops" prop:item_template="Faves_Buddy.Items.DropRow" prop:role='["td-wait"]'></anvil-component></div>
+        <div class="fb-panel td-help">
+          <h2>Getting your tabs and screenshots in</h2>
+          <p class="ok small" anvil:name="installed_note"><i class="ic ic-check"></i> Faves Buddy is installed on this device.</p>
+          <anvil-component type="Button" name="install_button" prop:text="Install Faves Buddy on this device" prop:role='["btn", "btn-primary", "ic-download"]'></anvil-component>
+          <details anvil:name="h_android"><summary><i class="ic ic-phone"></i>Android phone (Chrome)</summary><ol><li>Install Faves Buddy once (the Install button, or Chrome menu <b>⋮ → Add to Home screen</b>). <a href="#app">Step by step</a></li><li>In Chrome, open the tab switcher, touch and hold any tab (or tap <b>⋮</b>) and choose <b>Select tabs</b>.</li><li>Tick the tabs (or all of them), tap <b>⋮ → Share tabs</b> and pick <b>Faves Buddy</b>.</li><li>They open here, already sorted. Swipe through them. Close the tabs in Chrome afterwards.</li></ol><p class="small muted">Screenshots: in Photos or Gallery, select several, tap <b>Share</b> and pick <b>Faves Buddy</b>. Or use <b>Sweep my screenshots</b> above.</p></details>
+          <details anvil:name="h_ios"><summary><i class="ic ic-phone"></i>iPhone or iPad</summary><ol><li>In Safari, open the tab overview, then touch and hold the tab group's name (or tap <b>⋯</b>) and choose <b>Copy N Links</b>.</li><li>Come back here, open <b>Sort my open tabs</b> and tap <b>Paste</b>. The titles come along.</li><li>Chrome on iPhone: in the tab grid tap <b>Edit → Select tabs</b>, pick them, then <b>Share → Copy</b>, and paste here.</li></ol><p class="small muted">Screenshots: <b>Sweep my screenshots</b> lets you pick a batch from the Screenshots album. To keep Faves Buddy on your Home Screen: Safari <b>Share → Add to Home Screen</b> (<a href="#app">step by step</a>).</p></details>
+          <details anvil:name="h_desktop"><summary><i class="ic ic-puzzle"></i>A computer (Chrome extension)</summary><ol><li>Install the <a href="#tools">Chrome extension</a> and connect it.</li><li>Open it and look under <b>Tabs on your other devices</b>: with Chrome sync on, your phone's open Chrome tabs are listed there.</li><li>Tap <b>Sort these</b> and they open here as a pile to swipe through. (Or save this computer's window in one click.)</li></ol></details>
+        </div>
+      </div>
+
+      <div anvil:name="tabs_part">
+        <div class="ui-page-head"><div><a class="ui-btn ghost sm" href="#tidy"><i class="ic ic-back"></i>Tidy up</a><h1>Sort my open tabs</h1></div></div>
+
+        <div anvil:name="input_part">
+          <div class="fb-panel td-input ui-stack">
+            <div><h2>Your tabs</h2><p class="muted small">One link per line. Pasting Safari's or Chrome's copied links keeps their titles. Nothing is opened yet; they're sorted from the link and title.</p></div>
+            <anvil-component type="TextArea" name="paste_box" prop:placeholder="https://…" prop:height="150" prop:role='["td-paste"]'></anvil-component>
+            <div class="ui-row">
+              <anvil-component type="Button" name="clip_button" prop:text="Paste" prop:role='["btn", "ic-copy"]'></anvil-component>
+              <span class="ui-spacer"></span>
+              <anvil-component type="Button" name="sort_button" prop:text="Sort them" prop:role='["btn", "btn-primary", "btn-lg", "ic-sort"]'></anvil-component>
+            </div>
+          </div>
+          <div class="fb-panel td-help"><details open><summary><i class="ic ic-info"></i>How to get my tabs here</summary>
+            <div anvil:name="i_android"><ol><li>Install Faves Buddy once (the Install button, or Chrome menu <b>⋮ → Add to Home screen</b>). <a href="#app">Step by step</a></li><li>In Chrome, open the tab switcher, touch and hold any tab (or tap <b>⋮</b>) and choose <b>Select tabs</b>.</li><li>Tick the tabs (or all of them), tap <b>⋮ → Share tabs</b> and pick <b>Faves Buddy</b>.</li><li>They open here, already sorted. Swipe through them. Close the tabs in Chrome afterwards.</li></ol></div><div anvil:name="i_ios"><ol><li>In Safari, open the tab overview, then touch and hold the tab group's name (or tap <b>⋯</b>) and choose <b>Copy N Links</b>.</li><li>Come back here, open <b>Sort my open tabs</b> and tap <b>Paste</b>. The titles come along.</li><li>Chrome on iPhone: in the tab grid tap <b>Edit → Select tabs</b>, pick them, then <b>Share → Copy</b>, and paste here.</li></ol></div><div anvil:name="i_desktop"><ol><li>Install the <a href="#tools">Chrome extension</a> and connect it.</li><li>Open it and look under <b>Tabs on your other devices</b>: with Chrome sync on, your phone's open Chrome tabs are listed there.</li><li>Tap <b>Sort these</b> and they open here as a pile to swipe through. (Or save this computer's window in one click.)</li></ol><p class="small muted">On a phone? Open Faves Buddy there: Android shares tabs straight in, iPhone copies them in one go.</p></div>
+          </details></div>
+        </div>
+
+        <div anvil:name="top_part">
+          <div class="td-top">
+            <div><anvil-component type="Label" name="count_label" prop:role='["strong", "inline"]'></anvil-component> <anvil-component type="Label" name="tally_label" prop:role='["fine-print", "inline"]'></anvil-component></div>
+            <div class="ui-seg" role="group" aria-label="View">
+              <button type="button" anvil:name="view_deck" data-view="deck" anvil:on-dom:click="self.view_click">Cards</button>
+              <button type="button" anvil:name="view_list" data-view="list" anvil:on-dom:click="self.view_click">List</button>
+            </div>
+          </div>
+          <div class="td-bar"><i anvil:dom-node="bar"></i></div>
+        </div>
+
+        <div anvil:name="deck_part">
+          <div class="td-sure" anvil:name="sure_part"><i class="ic ic-sparkle"></i><span><b anvil:dom-node="sure_n"></b> of these tabs are sorted with confidence.</span>
+            <anvil-component type="Button" name="sure_button" prop:text="Keep them as sorted" prop:role='["btn", "btn-sm"]'></anvil-component></div>
+          <div class="td-stage">
+            <div class="td-card" anvil:dom-node="card">
+              <span class="td-stamp keep">KEEP</span><span class="td-stamp skip">SKIP</span>
+              <anvil-component type="Faves_Buddy.Components.Cover" name="card_cover"></anvil-component>
+              <h2 anvil:dom-node="card_title"></h2>
+              <div class="fb-sub"><i class="ic ic-globe"></i><span anvil:dom-node="card_site"></span></div>
+              <p class="td-desc" anvil:name="card_desc" anvil:dom-node="card_desc_t"></p>
+              <div class="td-already" anvil:name="card_already"><i class="ic ic-check"></i><span anvil:dom-node="card_already_t"></span></div>
+              <div class="td-sorted">
+                <div class="fb-why"><span anvil:dom-node="card_why"></span><anvil-component type="RepeatingPanel" name="card_reasons" prop:item_template="Faves_Buddy.Items.Reason" prop:role='["contents"]'></anvil-component></div>
+                <anvil-component type="Faves_Buddy.Components.CatPicker" name="card_picker" prop:small="true" prop:scroll="true"></anvil-component>
+              </div>
+            </div>
+            <div class="td-acts">
+              <anvil-component type="Button" name="skip_button" prop:text="Skip" prop:tooltip="Skip (←)" prop:role='["btn", "ic-x", "td-skip"]'></anvil-component>
+              <anvil-component type="Button" name="later_button" prop:text="Later" prop:tooltip="Later: to the inbox (↓)" prop:role='["btn", "ic-inbox"]'></anvil-component>
+              <anvil-component type="Button" name="keep_button" prop:tooltip="Keep (→)" prop:role='["btn", "btn-primary", "ic-heart", "td-keep"]'></anvil-component>
+            </div>
+            <div class="td-under">
+              <anvil-component type="Button" name="undo_button" prop:text="Undo" prop:role='["btn", "btn-ghost", "btn-sm", "ic-back"]'></anvil-component>
+              <a class="ui-btn ghost sm" anvil:name="card_open" target="_blank" rel="noopener"><i class="ic ic-external"></i>Open the page</a>
+              <anvil-component type="Button" name="finish_now_button" prop:text="Finish now" prop:role='["btn", "btn-ghost", "btn-sm"]'></anvil-component>
+            </div>
+          </div>
+        </div>
+
+        <div anvil:name="list_part">
+          <p class="muted small">Untick what you don't want. Change a category with the menu. Then save them all.</p>
+          <anvil-component type="RepeatingPanel" name="list_rows" prop:item_template="Faves_Buddy.Items.TidyRow" prop:role='["td-list"]'></anvil-component>
+          <div class="td-sticky"><anvil-component type="Button" name="list_done_button" prop:text="Done: save the ticked ones" prop:role='["btn", "btn-primary", "btn-lg", "ic-check"]'></anvil-component></div>
+        </div>
+
+        <div anvil:name="finish_part">
+          <div class="fb-panel td-done">
+            <div class="big">🧹</div>
+            <anvil-component type="Label" name="finish_title" prop:role='["sec-title"]'></anvil-component>
+            <anvil-component type="Label" name="finish_text" prop:role='["fine-print"]'></anvil-component>
+            <anvil-component type="RepeatingPanel" name="finish_tally" prop:item_template="Faves_Buddy.Items.Chip" prop:role='["td-tally"]'></anvil-component>
+            <div class="td-group" anvil:name="group_part">
+              <anvil-component type="CheckBox" name="group_box" prop:text="Also keep them together as a tab set, to reopen them all at once"></anvil-component>
+              <anvil-component type="TextBox" name="group_name"></anvil-component>
+            </div>
+            <div class="ui-row td-center">
+              <anvil-component type="Button" name="back_button" prop:text="Back to the cards" prop:role='["btn", "btn-ghost", "ic-back"]'></anvil-component>
+              <anvil-component type="Button" name="save_button" prop:role='["btn", "btn-primary", "btn-lg", "ic-heart"]'></anvil-component>
+            </div>
+          </div>
+        </div>
+
+        <div anvil:name="done_part">
+          <div class="fb-panel td-done">
+            <div class="big">✨</div><h2>Tidy!</h2>
+            <anvil-component type="Label" name="done_text" prop:role='["fine-print"]'></anvil-component>
+            <anvil-component type="RepeatingPanel" name="done_tally" prop:item_template="Faves_Buddy.Items.Chip" prop:role='["td-tally"]'></anvil-component>
+            <div class="ui-row td-center">
+              <a class="ui-btn primary" anvil:name="sweep_link" href="#tidy/shots"><i class="ic ic-image"></i><span anvil:dom-node="sweep_t"></span></a>
+              <a class="ui-btn" anvil:name="tabset_link" href="#tabs"><i class="ic ic-tabs"></i>See the tab set</a>
+              <a class="ui-btn" href="#inbox"><i class="ic ic-inbox"></i>Inbox</a>
+              <a class="ui-btn ghost" href="#tidy">Tidy more</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div anvil:name="shots_part">
+        <div class="ui-page-head"><div><a class="ui-btn ghost sm" href="#tidy"><i class="ic ic-back"></i>Tidy up</a><h1>Sweep my screenshots</h1>
+          <p class="muted">Each one is read on this device (free, private: the picture doesn't leave your phone for this), then sorted. Keep the useful ones, skip the rest. Skipped ones won't show up again.</p></div></div>
+        <div class="fb-panel ui-stack">
+          <div class="td-src">
+            <label class="ui-btn primary lg"><i class="ic ic-image"></i>Choose screenshots<input type="file" accept="image/*" multiple hidden anvil:dom-node="shot_files"></label>
+            <anvil-component type="Button" name="folder_button" prop:text="Choose a folder" prop:role='["btn", "ic-layers"]'></anvil-component>
+            <anvil-component type="Button" name="recheck_button" prop:role='["btn", "ic-refresh"]'></anvil-component>
+          </div>
+          <anvil-component type="CheckBox" name="shot_ocr_box" prop:text="Read the text in them (the first time downloads the reader, about 10 MB)" prop:role='["small-check"]'></anvil-component>
+          <div class="ui-row" anvil:name="seen_part"><anvil-component type="Label" name="seen_label" prop:role='["fine-print"]'></anvil-component><anvil-component type="Button" name="forget_button" prop:text="Show them again next time" prop:role='["btn", "btn-ghost", "btn-sm"]'></anvil-component></div>
+          <anvil-component type="Label" name="shot_tip" prop:role='["fine-print"]'></anvil-component>
+        </div>
+        <div class="td-summary" anvil:name="summary">
+          <anvil-component type="Label" name="summary_text" prop:role='["grow"]'></anvil-component>
+          <anvil-component type="Button" name="show_hidden_button" prop:text="Show" prop:role='["btn", "btn-ghost", "btn-sm"]'></anvil-component>
+          <anvil-component type="Button" name="keep_all_button" prop:role='["btn", "btn-sm", "btn-primary", "ic-check"]'></anvil-component>
+        </div>
+        <anvil-component type="RepeatingPanel" name="shots" prop:item_template="Faves_Buddy.Items.ShotRow" prop:role='["td-shots"]'></anvil-component>
+      </div>
+    </div>
+  </anvil-block>
+</anvil-form>

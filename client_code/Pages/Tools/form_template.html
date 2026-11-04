@@ -1,0 +1,151 @@
+<anvil-form layout="Faves_Buddy.Layouts.Shell">
+  <anvil-block slot="content">
+    <div class="ui-wrap">
+      <div class="ui-page-head"><div><h1>Tools</h1><p class="muted">Bring your stuff in, take it out, and plug in the extras.</p></div></div>
+      <div class="tl-layout">
+        <nav class="tl-nav" aria-label="Tools">
+          <a href="#tools/extension" anvil:name="n_extension"><i class="ic ic-puzzle"></i>Browser extension</a>
+          <a href="#tools/phone" anvil:name="n_phone"><i class="ic ic-phone"></i>On your phone</a>
+          <a href="#tools/import" anvil:name="n_import"><i class="ic ic-upload"></i>Import</a>
+          <a href="#tools/export" anvil:name="n_export"><i class="ic ic-download"></i>Export</a>
+          <a href="#tools/ai" anvil:name="n_ai"><i class="ic ic-wand"></i>AI (your key)</a>
+          <a href="#tools/events" anvil:name="n_events"><i class="ic ic-ticket"></i>Events key</a>
+          <a href="#tools/home" anvil:name="n_home"><i class="ic ic-pin"></i>Home spot &amp; privacy</a>
+          <a href="#tools/learned" anvil:name="n_learned"><i class="ic ic-sparkle"></i>What it learned</a>
+          <a href="#tools/samples" anvil:name="n_samples"><i class="ic ic-grid"></i>Sample faves</a>
+        </nav>
+        <div class="tl-sec">
+          <div anvil:name="s_extension" class="tl-sec">
+            <div class="fb-panel"><h2>Faves Buddy for Chrome</h2><p class="muted">Save the tab you're on, a whole window of tabs (and close them), a link, a picture or selected text, from the toolbar or the right-click menu. Works in Chrome, Edge, Brave and Arc.</p>
+              <ol class="tl-steps"><li><a class="ui-btn primary sm" href="_/theme/faves-buddy-extension.zip" download><i class="ic ic-download"></i>Download the extension (.zip)</a> and unzip it.</li>
+                <li>Open <b>chrome://extensions</b>, switch on <b>Developer mode</b> (top right), click <b>Load unpacked</b> and pick the unzipped folder.</li>
+                <li>Pin it (the puzzle icon → pin), click it, and paste your connection code below.</li></ol>
+              <p class="muted small">Shortcuts once installed: <b>Alt+Shift+S</b> saves this tab, <b>Alt+Shift+W</b> saves the whole window.</p></div>
+            <div class="fb-panel"><h3>Your connection code</h3><p class="muted small">It lets the extension save into your account. Treat it like a password; anyone with it can add faves (but can't read them).</p>
+              <anvil-component type="Label" name="code" prop:role='["tl-code"]'></anvil-component>
+              <div class="ui-row tl-code-row">
+                <anvil-component type="Button" name="copy_code_button" prop:text="Copy code" prop:role='["btn", "btn-primary", "ic-copy"]'></anvil-component>
+                <anvil-component type="Button" name="rotate_button" prop:text="Make a new code" prop:role='["btn", "ic-refresh"]'></anvil-component>
+                <anvil-component type="Label" name="ext_saved" prop:role='["fine-print"]'></anvil-component>
+              </div>
+              <p class="muted small">Making a new code disconnects every browser that used the old one.</p></div>
+          </div>
+
+          <div anvil:name="s_phone" class="tl-sec">
+            <div class="fb-panel"><h2>Faves Buddy on your phone</h2><p class="muted">Open Faves Buddy in your phone's browser and sign in. Then:</p>
+              <ul class="ui-stack tl-list"><li><b>Android:</b> install it (Chrome menu ⋮ → <b>Add to Home screen</b>). It then appears in the share sheet: share a pile of Chrome tabs (tab switcher → <b>Select tabs</b> → ⋮ → <b>Share tabs</b>) or a batch of screenshots from Photos, and swipe through them here.</li>
+                <li><b>iPhone:</b> Safari <b>Share → Add to Home Screen</b>. For tabs, use Safari's <b>Copy N Links</b> and paste them in <b>Tidy my open tabs</b>; for screenshots, pick a batch in <b>Sweep my screenshots</b>.</li>
+                <li><b>From a computer:</b> the Chrome extension lists the tabs open on your phone's Chrome (with Chrome sync on) under <b>Tabs on your other devices</b>, ready to sort here.</li></ul>
+              <div class="ui-row tl-phone-row"><a class="ui-btn primary" href="#app"><i class="ic ic-phone"></i>Step-by-step install guide</a><a class="ui-btn" href="#tidy"><i class="ic ic-wand"></i>Open Tidy up</a>
+                <anvil-component type="Button" name="copy_link_button" prop:text="Copy the app's address" prop:role='["btn", "ic-copy"]'></anvil-component></div></div>
+          </div>
+
+          <div anvil:name="s_import" class="tl-sec">
+            <div class="fb-panel"><h2>Import</h2><p class="muted">Drop a file. Everything lands in your inbox, sorted; links are read in the background so a big import is quick. Duplicates are merged.</p>
+              <label class="ad-drop tl-drop" anvil:dom-node="drop"><i class="ic ic-upload"></i><b>Drop a file here, or tap to choose</b><span class="muted small">.html bookmarks, OneTab .txt, Pocket .csv, Google Takeout .json / .csv, or any text with links</span><input type="file" hidden accept=".html,.htm,.txt,.csv,.json,.geojson" anvil:dom-node="file"></label>
+              <details class="tl-paste"><summary class="muted small">Or paste links / OneTab text</summary>
+                <anvil-component type="TextArea" name="paste_box" prop:placeholder="https://… one per line, or OneTab's “url | title” lines" prop:height="110"></anvil-component>
+                <anvil-component type="Button" name="parse_button" prop:text="Read the text" prop:role='["btn", "btn-sm"]'></anvil-component>
+              </details>
+              <div anvil:name="import_preview" class="tl-import">
+                <anvil-component type="Label" name="import_note" prop:role='["msg-note"]'></anvil-component>
+                <anvil-component type="Label" name="import_sample" prop:role='["fine-print", "tl-sample"]'></anvil-component>
+                <div class="ui-row">
+                  <anvil-component type="TextBox" name="group_box" prop:placeholder="Group name (optional)" prop:role='["grow-box"]'></anvil-component>
+                  <anvil-component type="Button" name="import_button" prop:role='["btn", "btn-primary", "ic-upload"]'></anvil-component>
+                </div>
+                <p class="muted small">The group shows under Tab sets, so you can open, keep or remove the whole import at once.</p>
+              </div>
+              <anvil-component type="Label" name="import_none" prop:text="No links or places found in that file." prop:role='["msg-error"]' prop:visible="false"></anvil-component>
+            </div>
+            <div class="fb-panel"><h3>Where to find your exports</h3><div class="tl-formats">
+              <div><b>Chrome bookmarks</b>Bookmarks manager (Ctrl+Shift+O) → ⋮ → Export bookmarks. Folders become tags.</div>
+              <div><b>OneTab</b>OneTab → Export / Import URLs → copy the text.</div>
+              <div><b>Pocket</b>Your Pocket export CSV (title, url, tags).</div>
+              <div><b>Google Maps</b>takeout.google.com → “Maps (your places)” or “Saved” → Saved Places.json or a list's .csv.</div>
+              <div><b>Safari / Firefox</b>File → Export bookmarks (HTML).</div><div><b>Anything else</b>A text or CSV file with links in it.</div></div></div>
+          </div>
+
+          <div anvil:name="s_export" class="tl-sec">
+            <div class="fb-panel"><h2>Export</h2><p class="muted">Your faves are yours. Take them anywhere, anytime.</p>
+              <div class="ui-row">
+                <anvil-component type="Button" name="exp_json" prop:text="Everything (JSON)" prop:role='["btn", "ic-download"]'></anvil-component>
+                <anvil-component type="Button" name="exp_csv" prop:text="Spreadsheet (CSV)" prop:role='["btn", "ic-download"]'></anvil-component>
+                <anvil-component type="Button" name="exp_geojson" prop:text="Places (GeoJSON)" prop:role='["btn", "ic-download"]'></anvil-component>
+                <anvil-component type="Button" name="exp_html" prop:text="Bookmarks (HTML)" prop:role='["btn", "ic-download"]'></anvil-component>
+              </div>
+              <p class="muted small">GeoJSON opens in Google My Maps, QGIS or uMap. The bookmarks file imports into any browser, with a folder per category.</p></div>
+          </div>
+
+          <div anvil:name="s_ai" class="tl-sec">
+            <div class="fb-panel">
+              <div class="ui-row between"><h2>AI second opinion for sorting</h2><span class="ui-badge brand">In progress</span></div>
+              <p class="muted">The sorter works without AI. When this is on, the items it isn’t sure about get a second opinion from Claude in your inbox, with a one-line reason. It only suggests; you still choose. Only the title, the website, the link’s path and a short bit of text go to Anthropic (no pictures). This uses the app’s own key, not yours.</p>
+              <anvil-component type="CheckBox" name="aisort_box" prop:text="Ask the AI about items the sorter isn’t sure of"></anvil-component>
+              <p class="ui-note" anvil:name="aisort_soon"><i class="ic ic-clock"></i> Coming soon: this is built and being switched on. Nothing is sent to any AI until it is, and you’ll opt in here.</p>
+            </div>
+            <div class="fb-panel"><h2>AI with your own key</h2>
+              <p class="muted">Faves Buddy sorts everything without AI. With your own Anthropic API key, it can also describe pictures and screenshots: what they show, the places and dates in them, a better title. The key is stored only in this browser and sent only to Anthropic; our server never sees it or your pictures' AI requests. You pay Anthropic directly (usually a fraction of a cent per picture).</p>
+              <div class="ui-stack">
+                <label class="ui-field"><span>Anthropic API key</span><anvil-component type="TextBox" name="ai_key_box" prop:hide_text="true" prop:placeholder="sk-ant-…"></anvil-component></label>
+                <label class="ui-field"><span>Model</span><anvil-component type="DropDown" name="ai_model_box"></anvil-component></label>
+                <div class="ui-row">
+                  <anvil-component type="Button" name="ai_save_button" prop:text="Save" prop:role='["btn", "btn-primary"]'></anvil-component>
+                  <anvil-component type="Button" name="ai_test_button" prop:text="Test it" prop:role='["btn"]'></anvil-component>
+                  <anvil-component type="Button" name="ai_clear_button" prop:text="Remove key" prop:role='["btn", "btn-danger"]'></anvil-component>
+                </div>
+              </div>
+              <p class="muted small">Get a key at console.anthropic.com → API keys. Set a monthly spend limit there for peace of mind.</p></div>
+          </div>
+
+          <div anvil:name="s_events" class="tl-sec">
+            <div class="fb-panel"><h2>Dated events (Ticketmaster)</h2><p class="muted">Discover finds festivals near you from Wikidata with no setup. For concerts, shows and games with dates, add a free Ticketmaster Discovery API key (5,000 searches a day). It stays in this browser and goes only to Ticketmaster.</p>
+              <ol class="tl-steps"><li>Sign up at developer.ticketmaster.com (free).</li><li>Open “My Apps”: copy the <b>Consumer Key</b>.</li><li>Paste it here.</li></ol>
+              <div class="ui-row">
+                <anvil-component type="TextBox" name="tm_box" prop:hide_text="true" prop:placeholder="Consumer key" prop:role='["grow-box"]'></anvil-component>
+                <anvil-component type="Button" name="tm_save_button" prop:text="Save" prop:role='["btn", "btn-primary"]'></anvil-component>
+                <anvil-component type="Button" name="tm_clear_button" prop:text="Remove" prop:role='["btn", "btn-danger"]'></anvil-component>
+              </div></div>
+          </div>
+
+          <div anvil:name="s_home" class="tl-sec">
+            <div class="fb-panel"><h2>Home spot</h2><p class="muted">Used for distances, Discover and Top faves when your location isn't shared. Only the spot you choose is stored, never your live location.</p>
+              <anvil-component type="Label" name="home_label" prop:role='["strong"]'></anvil-component>
+              <div class="ui-row">
+                <anvil-component type="Button" name="home_here_button" prop:text="Use where I am now" prop:role='["btn", "ic-locate"]'></anvil-component>
+                <anvil-component type="Button" name="home_clear_button" prop:text="Clear" prop:role='["btn", "btn-danger"]'></anvil-component>
+              </div>
+              <div class="ui-row tl-home-search">
+                <anvil-component type="TextBox" name="home_box" prop:type="search" prop:placeholder="Or search: a neighbourhood, a street…" prop:role='["grow-box"]'></anvil-component>
+                <anvil-component type="Button" name="home_search_button" prop:text="Search" prop:role='["btn", "ic-search"]'></anvil-component>
+              </div>
+              <anvil-component type="RepeatingPanel" name="home_results" prop:item_template="Faves_Buddy.Items.Chip" prop:role='["fb-chips"]'></anvil-component>
+            </div>
+            <div class="fb-panel"><h2>Top faves</h2><p class="muted">Top faves shows the places people save most around a spot. Your saved places count toward it anonymously: only places at least two people saved are shown, never who saved them, and never notes, tags or pictures.</p>
+              <anvil-component type="CheckBox" name="top_box" prop:text="Count my saved places in Top faves (anonymously)"></anvil-component></div>
+          </div>
+
+          <div anvil:name="s_learned" class="tl-sec">
+            <div class="fb-panel"><h2>What Faves Buddy learned from you</h2><p class="muted">Each time you keep a fave in a category (or move it), the sorter remembers the website and the words in its title. No AI, no data leaves your account.</p>
+              <div class="ui-row tl-stats">
+                <div><anvil-component type="Label" name="lessons" prop:role='["tl-big"]'></anvil-component><span class="muted small">lessons</span></div>
+                <div anvil:name="right_part"><anvil-component type="Label" name="right" prop:role='["tl-big"]'></anvil-component><anvil-component type="Label" name="right_text" prop:role='["fine-print"]'></anvil-component></div>
+              </div>
+              <anvil-component type="Label" name="learned_none" prop:text="Nothing yet. Keep a few faves from your inbox and it starts learning." prop:role='["fine-print"]'></anvil-component>
+              <div anvil:name="domains_part"><h3>Websites</h3><anvil-component type="RepeatingPanel" name="domains" prop:item_template="Faves_Buddy.Items.LearnedRow" prop:role='["tl-table"]'></anvil-component></div>
+              <div anvil:name="words_part"><h3>Words</h3><anvil-component type="RepeatingPanel" name="words" prop:item_template="Faves_Buddy.Items.LearnedRow" prop:role='["tl-table"]'></anvil-component></div>
+              <anvil-component type="Button" name="forget_all_button" prop:text="Forget everything it learned" prop:role='["btn", "btn-danger", "ic-trash"]'></anvil-component></div>
+          </div>
+
+          <div anvil:name="s_samples" class="tl-sec">
+            <div class="fb-panel"><h2>Sample faves</h2><p class="muted">About thirty example faves (made-up places around Montréal, recipes, reads, a poster screenshot, a few tabs waiting in the inbox) and three lists. A good way to try everything. Samples never teach the sorter.</p>
+              <div class="ui-row">
+                <anvil-component type="Button" name="samples_load" prop:text="Add sample faves" prop:role='["btn", "btn-primary", "ic-sparkle"]'></anvil-component>
+                <anvil-component type="Button" name="samples_remove" prop:text="Remove sample faves" prop:role='["btn", "btn-danger", "ic-trash"]'></anvil-component>
+              </div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </anvil-block>
+</anvil-form>

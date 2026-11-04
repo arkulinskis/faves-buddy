@@ -1,0 +1,21 @@
+<anvil-form layout="Faves_Buddy.Layouts.Shell">
+  <anvil-block slot="content">
+    <div class="ui-wrap">
+      <div class="ib-head">
+        <div>
+          <anvil-component type="Label" name="title" prop:text="Inbox" prop:role='["page-title"]'></anvil-component>
+          <anvil-component type="Label" name="summary" prop:role='["fine-print", "ib-summary"]'></anvil-component>
+        </div>
+        <anvil-component type="Button" name="accept_button" prop:role='["btn", "btn-primary", "ic-sparkle"]'></anvil-component>
+      </div>
+      <div class="ib-progress" anvil:name="progress"><i class="ic ic-refresh"></i><anvil-component type="Label" name="progress_text"></anvil-component><span class="bar"><i anvil:dom-node="progress_fill"></i></span></div>
+      <p class="ib-keys" anvil:name="keys">Keys: <kbd>J</kbd>/<kbd>K</kbd> move · <kbd>Enter</kbd> keep · <kbd>A</kbd> archive · <kbd>S</kbd> snooze · <kbd>Del</kbd> delete</p>
+      <anvil-component type="RepeatingPanel" name="items_panel" prop:item_template="Faves_Buddy.Items.InboxItem" prop:role='["ib-list"]'></anvil-component>
+      <div class="ib-zero fb-panel" anvil:name="zero">
+        <div class="big">🎉</div><h2>Inbox zero</h2>
+        <p class="muted">Everything is sorted. New tabs, pins and screenshots you save will show up here.</p>
+        <div class="ui-row ib-zero-actions"><a class="ui-btn primary" href="#add"><i class="ic ic-plus"></i>Save something</a><a class="ui-btn" href="#home">See your faves</a></div>
+      </div>
+    </div>
+  </anvil-block>
+</anvil-form>
