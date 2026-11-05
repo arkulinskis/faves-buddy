@@ -593,7 +593,7 @@ def set_prefs(home=None, settings=None):
             p["home"] = {"lat": lat, "lng": lng, "label": C.text(home.get("label"), 80) or "Home base"}
     if isinstance(settings, dict):
         s = dict(p["settings"] or {})
-        for k in ("radius_km", "units", "auto_keep", "events_classes", "ai_sort"):
+        for k in ("radius_km", "units", "auto_keep", "events_classes", "ai_sort", "top_faves"):
             if k in settings:
                 s[k] = settings[k] if not isinstance(settings[k], str) else C.text(settings[k], 60)
         p["settings"] = s

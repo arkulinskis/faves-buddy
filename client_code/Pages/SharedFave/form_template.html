@@ -1,0 +1,36 @@
+<anvil-form layout="Faves_Buddy.Layouts.Shell">
+  <anvil-block slot="content">
+    <div class="ui-wrap sf-wrap">
+      <div anvil:name="found_part">
+        <div class="fv-top">
+          <div class="fv-pic"><anvil-component type="Faves_Buddy.Components.Cover" name="cover"></anvil-component></div>
+          <div>
+            <span class="eyebrow" anvil:dom-node="by"></span>
+            <div class="ui-row fv-badges"><span class="fb-cat"><span class="dot" anvil:dom-node="cat_dot"></span><span anvil:dom-node="cat_name"></span></span></div>
+            <anvil-component type="Label" name="title" prop:role='["fv-title"]'></anvil-component>
+            <anvil-component type="Label" name="desc" prop:role='["fine-print", "fv-desc"]'></anvil-component>
+            <anvil-component type="RepeatingPanel" name="facts" prop:item_template="Faves_Buddy.Items.Fact" prop:role='["fv-facts"]'></anvil-component>
+            <div class="ui-row fv-links">
+              <a class="ui-btn" anvil:name="open_link" target="_blank" rel="noopener"><i class="ic ic-external"></i><span anvil:dom-node="open_text">Open</span></a>
+              <a class="ui-btn" anvil:name="dir_link" target="_blank" rel="noopener"><i class="ic ic-compass"></i>Directions</a>
+            </div>
+            <div class="sf-save">
+              <anvil-component type="Button" name="save_button" prop:text="Save to my faves" prop:role='["btn", "btn-primary", "btn-lg", "ic-heart"]'></anvil-component>
+              <a class="ui-btn primary lg" anvil:name="yours_link" href="#home"><i class="ic ic-heart"></i>It's in your faves: open it</a>
+              <div anvil:name="guest_part">
+                <anvil-component type="Button" name="signup_button" prop:text="Create a free account to save it" prop:role='["btn", "btn-primary", "btn-lg", "ic-heart"]'></anvil-component>
+                <p class="muted small sf-or">Already have an account? <a href="#auth" anvil:name="signin_link" anvil:on-dom:click="self.signin_click">Sign in</a> and it's saved for you.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div anvil:name="map_part"><div class="fb-section"><h2>On the map</h2></div><anvil-component type="Faves_Buddy.Components.MapView" name="map" prop:role='["fv-map"]'></anvil-component></div>
+        <div class="sh-cta" anvil:name="cta">
+          <div><h3>Keep your own favourites like this</h3><p class="muted">Save tabs, map pins and screenshots from anywhere; Faves Buddy sorts them for you and shows what's near you. Free.</p></div>
+          <a class="ui-btn" href="#landing">What's Faves Buddy?</a>
+        </div>
+      </div>
+      <div class="ui-empty" anvil:name="missing"><i class="ic ic-lock"></i><h3>This link doesn't work any more</h3><anvil-component type="Label" name="missing_text"></anvil-component><a class="ui-btn primary" href="#landing">About Faves Buddy</a></div>
+    </div>
+  </anvil-block>
+</anvil-form>

@@ -257,10 +257,12 @@ def shot_save(fields):
     elif not f.get("photo"):
         return C.fail("No picture to save.")
     cat = f.get("category") if f.get("category") in T.BY_ID else None
-    found = f.get("found") if isinstance(f.get("found"), dict) else {}
-    found = {k: [C.text(x, 200) for x in (v or [])[:8] if isinstance(x, str)] for k, v in found.items()
+    raw_found = f.get("found")
+    found_in: dict = raw_found if isinstance(raw_found, dict) else {}
+    found = {k: [C.text(x, 200) for x in (v or [])[:8] if isinstance(x, str)] for k, v in found_in.items()
              if k in ("urls", "emails", "phones", "dates", "times", "addresses", "handles", "prices")}
-    exif = f.get("exif") if isinstance(f.get("exif"), dict) else {}
+    raw_exif = f.get("exif")
+    exif: dict = raw_exif if isinstance(raw_exif, dict) else {}
     meta = {"ocr": C.text(f.get("ocr"), 6000, multiline=True), "found": found,
             "exif": {k: exif[k] for k in ("taken", "camera") if exif.get(k)}}
     url = C.text(f.get("url"), 1000) or None
@@ -338,7 +340,7 @@ def _drop_rows(me, code):
 def new_drop(links=None, files=None, note=None, title=None, claimed_by=None, name=None):
     """Park shared things under a fresh code. Returns the code."""
     code = Store.token(28)
-    base = {"owner": None, "status": "drop", "url_norm": "drop:" + code, "created": C.now(), "updated": C.now(),
+    base: dict = {"owner": None, "status": "drop", "url_norm": "drop:" + code, "created": C.now(), "updated": C.now(),
             "is_demo": False, "is_sample": False, "confirmed": False, "category": "other", "source": "share"}
     claim = {"claimed_by": claimed_by} if claimed_by else {}
     if links or note:
@@ -438,14 +440,15 @@ def _read_share(kw):
         take(k, v)
     ctype = (req.headers or {}).get("content-type") or ""
     if not files and "multipart/form-data" in ctype.lower() and req.body is not None:
-        raw = req.body.get_bytes() if hasattr(req.body, "get_bytes") else req.body
+        raw = getattr(req.body, "get_bytes")() if hasattr(req.body, "get_bytes") else req.body
         if isinstance(raw, str):
             raw = raw.encode("utf-8", errors="surrogateescape")
         try:
             msg = BytesParser(policy=policy.HTTP).parsebytes(b"Content-Type: " + ctype.encode() + b"\r\n\r\n" + raw)
             for part in msg.iter_parts():
                 name = part.get_param("name", header="content-disposition") or ""
-                data = part.get_payload(decode=True) or b""
+                payload = part.get_payload(decode=True)
+                data = payload if isinstance(payload, bytes) else b""
                 if part.get_filename() is not None:
                     if data:
                         files.append(anvil.BlobMedia(part.get_content_type() or "application/octet-stream", data, name=part.get_filename()))

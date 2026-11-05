@@ -34,7 +34,7 @@ def _body():
     if b is None:
         return {}
     if hasattr(b, "get_bytes"):
-        b = b.get_bytes()
+        b = getattr(b, "get_bytes")()
     if isinstance(b, bytes):
         b = b.decode("utf-8", errors="replace")
     try:
@@ -86,7 +86,8 @@ def _do(me, action, d):
         it = d.get("item") or {}
         if not (it.get("url") or it.get("title")):
             return {"ok": False, "error": "Nothing to save on this page."}
-        meta = it.get("meta") if isinstance(it.get("meta"), dict) else {}
+        raw_meta = it.get("meta")
+        meta: dict = raw_meta if isinstance(raw_meta, dict) else {}
         f = {"url": it.get("url"), "title": it.get("title"), "note": it.get("note"), "list_id": it.get("list_id"),
              "category": it.get("category") if it.get("category") in T.BY_ID else None, "meta": meta,
              "lat": meta.get("lat"), "lng": meta.get("lng"), "address": meta.get("address"),

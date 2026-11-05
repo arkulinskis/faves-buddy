@@ -123,7 +123,7 @@ def classify(info, model=None):
     kind0 = info.get("kind") or "link"
     if kind0 in ("note", "idea") and info.get("text"):
         # a note's own words matter as much as its first line
-        title, body = title + " " + info.get("text"), " ".join(x for x in [info.get("note"), info.get("ocr")] if x)
+        title, body = title + " " + (info.get("text") or ""), " ".join(x for x in [info.get("note"), info.get("ocr")] if x)
     t_title, t_body = padded(title), padded(body)
     osm = info.get("osm") or {}
     schema = [s.split("/")[-1] for s in (info.get("schema") or []) if s]
@@ -251,7 +251,7 @@ def _learned(model, dom, title, add):
         if total >= 1:
             add(best[0], W_LEARN_DOMAIN * best[1] / total, "you filed %s under %s before" % (dom, T.BY_ID.get(best[0], {}).get("name", best[0])))
     words = model.get("w") or {}
-    per = {}
+    per: dict = {}
     for w in title_tokens(title):
         wc = words.get(w)
         if not wc:

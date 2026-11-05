@@ -1,0 +1,21 @@
+<div class="td-shot-host"><div class="td-shot" anvil:name="box">
+  <img alt="" anvil:name="img" anvil:dom-node="img"><div class="ph" anvil:name="ph"></div>
+  <div class="body">
+    <div anvil:name="busy_part"><b anvil:dom-node="busy_name"></b><div class="st" anvil:dom-node="busy_st"></div><div class="fv-progress" anvil:name="bar"><i anvil:dom-node="fill"></i></div></div>
+    <div anvil:name="done_part"><i class="ic ic-check"></i> <a anvil:name="done_link" anvil:dom-node="done_a" href="#tidy"></a> <span class="muted small" anvil:dom-node="done_info"></span></div>
+    <div anvil:name="skipped_part"><span class="muted small" anvil:dom-node="skipped_t"></span></div>
+    <div anvil:name="ready_part" class="td-ready">
+      <anvil-component type="TextBox" name="title_box" prop:role='["td-shot-title"]'></anvil-component>
+      <div class="fb-why"><span anvil:dom-node="why"></span><anvil-component type="RepeatingPanel" name="reasons" prop:item_template="Faves_Buddy.Items.Reason" prop:role='["contents"]'></anvil-component></div>
+      <anvil-component type="Faves_Buddy.Components.CatPicker" name="picker" prop:small="true" prop:scroll="true"></anvil-component>
+      <anvil-component type="CheckBox" name="url_box" prop:role='["small-check"]'></anvil-component>
+      <details anvil:name="found_part"><summary class="small muted" anvil:dom-node="found_sum"></summary><anvil-component type="Faves_Buddy.Components.Found" name="found"></anvil-component></details>
+      <anvil-component type="Label" name="ocr" prop:role='["td-ocr"]'></anvil-component>
+      <div class="acts">
+        <anvil-component type="Button" name="keep_button" prop:role='["btn", "btn-primary", "ic-heart"]'></anvil-component>
+        <anvil-component type="Button" name="later_button" prop:text="Later" prop:role='["btn", "ic-inbox"]'></anvil-component>
+        <anvil-component type="Button" name="skip_button" prop:text="Skip" prop:role='["btn", "btn-ghost", "ic-x"]'></anvil-component>
+      </div>
+    </div>
+  </div>
+</div></div>

@@ -3,8 +3,9 @@
 A personal collection for everything you mean to come back to: open browser tabs (one or a whole window), Google Maps
 pins, screenshots and photos, notes and ideas. Each thing is sorted into a category **without AI** (rules + a small
 learner that picks up how you file things), places go on a map with "open now", Discover finds more of what you love in
-open data, and lists can be shared with a link or with people. A Chrome extension saves straight into it. Built on
-[Anvil](https://anvil.works).
+open data, Top faves shows what people save most around you, and lists or single faves can be shared with a link or with
+people. A Chrome extension saves straight into it. Built on [Anvil](https://anvil.works) as native Anvil Forms (Python
+Forms with HTML templates; the map, picture reading and AI stay as JavaScript engines in `theme/assets`).
 
 - **App repo:** github.com/arkulinskis/faves-buddy (branch `master`). Anvil pulls `master`.
 - **Live:** https://faves-buddy.anvil.app
@@ -12,8 +13,10 @@ open data, and lists can be shared with a link or with people. A Chrome extensio
 ## What it does
 
 **For visitors:** a landing page (promise, how it works, features, FAQ) that links to two public demo lists
-("Peek at a shared list"); any shared list opens without an account (`#s/<token>`); sign-up with email and password or Google;
-feedback form; Privacy & Terms.
+("Peek at a shared list"); any shared list or shared fave opens without an account (`#s/<token>`, `#f/<token>`); a shared
+fave can be saved after a quick sign-up (it is saved for them when they come back); **Get the app** (`#app`): how to install
+it on Android, iPhone/iPad and a computer (it installs from the browser, no store needed); sign-up with email and password
+or Google; Submit feedback (Prepsto); Privacy & Terms.
 
 **For members:**
 - **Faves (library, `#home`):** quick add (paste a link or Maps pin, or jot an idea: plain text = note, "idea:" = idea),
@@ -30,14 +33,19 @@ feedback form; Privacy & Terms.
   fave with a location, nearest first, with distance and open/closed (from OSM opening_hours). Near me, radius chips,
   category and list filters, Open now. Search a place by name (Photon) and save it from its popup. "Suggest nearby"
   runs your top Discover search around the map centre (dashed pins, save in one tap).
-- **Discover (`#discover/places|events|ideas`):** on-demand searches built from your taste (server `taste()`), around
+- **Top faves around you (home row, `#discover/top`, the map's "Top faves" button):** places saved by at least two
+  different people near you (`Social.top_faves`), most saved first, counted anonymously (never who, never notes or
+  pictures; samples don't count; anyone can opt out in Tools → Home spot & privacy). Save one in a tap.
+- **Discover (`#discover/places|top|events|ideas`):** on-demand searches built from your taste (server `taste()`), around
   one of your areas ("near Café Lumière"), your home spot or you, within 1–15 km. Each card shows its exact filter:
-  - *Places like yours:* OpenStreetMap via Overpass (`amenity=cafe + cuisine=… + outdoor_seating=yes`); when Overpass
-    is busy, the map tiles' own points of interest. Already-saved places are hidden; results rank by your preferred
+  - *Places like yours:* OpenStreetMap via Overpass (`amenity=cafe + cuisine=… + outdoor_seating=yes`; both public servers
+    asked at once) and the map tiles' own points of interest in parallel (a hidden map kept for the visit): the first
+    answer shows in about a second, OpenStreetMap's richer list replaces it when it arrives, and a search is cached for 15 minutes
+    (`FB.data.findPlaces` in fb-map.js). Already-saved places are hidden; results rank by your preferred
     tags, completeness (hours, website, Wikipedia) and distance.
   - *Events:* Wikidata festivals near you (no key); Ticketmaster Discovery events with your own free key.
   - *Ideas & reads:* Wikipedia "more like this" for your favourite reads/videos; Wikipedia articles around a spot.
-- **A fave (`#fave/<id>`):** picture, inline-editable title, open link / directions / OpenStreetMap, place facts (hours,
+- **A fave (`#fave/<id>`):** **Share** (a link to just this fave: copy, phone share sheet, email, text, turn off), picture, inline-editable title, open link / directions / OpenStreetMap, place facts (hours,
   open now, website, phone, cuisine, accessibility), event date, recipe time, reading time; status (worded per kind:
   Want to go / Been there, or To read / Done…) + 1–5 stars; category picker with reasons ("Let Faves Buddy sort it
   again"); tags; lists; note (saves on blur); mini map (click to move the pin) + "More like this nearby"; "Where is it?"
@@ -94,6 +102,8 @@ title words. Confidence = top / (top + second + 2). Research on 2026-10-31: 35/3
 ## Setting it up in Anvil (once)
 
 1. In the Anvil editor: **Create app → Clone from GitHub**, and paste `https://github.com/arkulinskis/faves-buddy`.
+   (The native-Forms version: Anvil follows the branch you publish; after a pull that adds columns, accept the Schema
+   Mismatch alert as in step 3.)
 2. **Users** service: email + password and "Continue with Google", sign-up allowed (already set in `anvil.yaml`; check it).
 3. Open the app in the editor. If it shows a **Schema Mismatch** alert, choose **"The schema of the source code is correct"** so Anvil creates the tables.
 4. **Run** it and sign up with **arkulinskis@gmail.com** straight away (that account becomes the admin).
@@ -128,23 +138,29 @@ What this project uses besides its own code. Generated by `APP_MAKER/tools/libra
 See `.claude/skills/favesbuddy/SKILL.md`. In short:
 
 ```
-python -I tools/check.py --ui                    # syntax, server tests, headless UI tests → ALL CHECKS PASSED
-python -I tools/preview/devserver.py 8765        # the app on in-memory data: http://localhost:8765/  (?as=ana#home, ?as=admin#admin)
-python -I tools/build_extension.py               # after changing extension/: icons + assets/faves-buddy-extension.zip
+python tools/check.py                            # Anvil's validator, JS syntax, asset hashes, server tests -> ALL CHECKS PASSED
+python -I tools/ui_test.py                       # the app in the Anvil App Server (Docker) + headless Chrome: journeys, phone width,
+                                                 #   admin, accessibility (WCAG 2.2 AA) -> ALL UI TESTS PASSED (--shots DIR for screenshots)
+python tools/assets.py                           # after changing theme/assets: cache-busting hashes in anvil.yaml + icons.css
+python -I tools/build_extension.py               # after changing extension/: icons + theme/assets/faves-buddy-extension.zip
 python -I tools/research/heldout.py              # sorter check (offline); classify_research.py reads live pages
-python tools/deploy.py                           # dry run (needs PyYAML, so no -I)
-python tools/deploy.py --push "Message"          # deploy: commit + push to GitHub, Anvil pulls it
+git push origin master                           # deploy: Anvil pulls master
 ```
 
 ## Project layout
 
 ```
-web/            the interface: core.js/core.css (engine + neumorphic design tokens), app.js (header, footer, tab bar), pages/*.html
-                (_fb = shared cards/helpers, _fbmap = map + open-data searches, _fbmedia = pictures, OCR, AI)
-client_code/    Main.py (the only Anvil form: bridge to the server, sign-in), legal.py
+client_code/    startup.py, router.py (pages + sign-in rules), state.py, auth.py, fb.py (categories, location, the engines),
+                Layouts/Shell (header, menu, footer, phone tab bar), Pages/ (one Form per page), Items/ (RepeatingPanel rows and
+                cards), Dialogs/ (lists, snooze, share), Components/ (Cover, MapView, CatPicker, Found, AiNudge), legal.py
+theme/assets/   app.css (tokens, the neumorphic look, every page, the Forms layer), app-kit.js, icons.css (generated),
+                fb-engine.js (covers, hours, distances, location, import/export, Tidy helpers), fb-map.js (MapLibre + open data),
+                fb-media.js (shrink, EXIF, on-device OCR, BYOK AI), legal-kit.js, icons, demo-poster.jpg, the extension zip
 server_code/    Taxonomy.py + Classify.py (sorting), Fetch.py (reading links, Maps URLs, OSM matching), Store.py (shared fave logic),
-                Faves.py, Lists.py, Clip.py (extension endpoint), Discover.py, DemoData.py, Admin.py, Accounts.py, Feedback.py, common.py
-extension/      the Chrome extension (manifest, background.js, popup); zipped into assets/ by tools/build_extension.py
-assets/         icon.svg + PNG icons, demo-poster.jpg, faves-buddy-extension.zip (served at _/theme/<name>)
-tools/          sync_to_anvil.py (settings + table schema), deploy.py, check.py, build_extension.py, research/, preview/, testing/
+                Faves.py, Lists.py, Social.py (shared fave links, Top faves), Clip.py (extension endpoint), Tidy.py (phone piles,
+                share target, manifest), Discover.py, AISort.py, DemoData.py, Admin.py, Accounts.py, Feedback.py, common.py
+extension/      the Chrome extension (manifest, background.js, popup); zipped into theme/assets by tools/build_extension.py
+tools/          check.py, ui_test.py + ui/ (flow, phone, admin, a11y, seed), assets.py, build_icons.py, build_extension.py,
+                live/drive.mjs, testing/ (server tests on a strict Anvil mock), research/ (sorter checks)
 ```
+

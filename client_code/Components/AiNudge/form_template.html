@@ -1,0 +1,13 @@
+---
+custom_component: true
+properties:
+  - name: what
+    type: string
+    default_value: describe pictures
+    description: What the key would let you do ("describe pictures and spot places in them")
+    default_binding_prop: true
+toolbox_item:
+  title: AI key nudge
+  group: Faves Buddy
+---
+<div class="fb-ai-nudge"><i class="ic ic-key"></i><span><b>Bring your own AI key</b> to <span anvil:dom-node="what"></span>. It stays in this browser; you pay Anthropic directly (cents). Everything else works without it.</span><a class="ui-btn sm" href="#tools/ai">Add key</a></div>

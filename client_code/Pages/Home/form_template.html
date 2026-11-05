@@ -1,0 +1,96 @@
+<anvil-form layout="Faves_Buddy.Layouts.Shell">
+  <anvil-block slot="content">
+    <div class="ui-wrap">
+      <div class="hm-hello">
+        <div>
+          <anvil-component type="Label" name="hello" prop:role='["page-title"]' prop:text="Hi 👋"></anvil-component>
+          <anvil-component type="Label" name="summary" prop:role='["fine-print", "hm-summary"]'></anvil-component>
+        </div>
+        <div class="ui-row"><a class="ui-btn" href="#map"><i class="ic ic-map"></i>Map</a><a class="ui-btn" href="#discover"><i class="ic ic-compass"></i>Discover</a></div>
+      </div>
+
+      <div class="hm-quick">
+        <anvil-component type="TextBox" name="quick_box" prop:placeholder="Paste a link or a Maps pin, or jot an idea…" prop:role='["hm-quick-box"]'></anvil-component>
+        <a class="ui-btn icon" href="#add/photo" title="Add pictures" aria-label="Add pictures"><i class="ic ic-camera"></i></a>
+        <anvil-component type="Button" name="quick_button" prop:text="Save" prop:role='["btn", "btn-primary", "ic-plus"]'></anvil-component>
+      </div>
+      <p class="hm-hint">Links are read and sorted for you. Plain text becomes a note (start with “idea:” for an idea).</p>
+      <div class="hm-tidy"><a class="ui-btn sm" href="#tidy/tabs"><i class="ic ic-tabs"></i>Tidy my open tabs</a><a class="ui-btn sm" href="#tidy/shots"><i class="ic ic-image"></i>Sweep my screenshots</a></div>
+
+      <a class="hm-inbox" href="#inbox" anvil:name="inbox_nudge">
+        <span class="big" anvil:dom-node="inbox_n"></span>
+        <div class="grow"><b anvil:dom-node="inbox_text"></b><div class="muted small">Already sorted with a suggestion each. Confirm them in a minute.</div></div>
+        <span class="ui-btn sm primary">Sort now <i class="ic ic-arrow"></i></span>
+      </a>
+
+      <div class="fb-panel hm-welcome" anvil:name="welcome">
+        <div>
+          <h2>Let's gather your favourite things</h2>
+          <p class="muted">Everything you save lands in your inbox, already sorted into a category with the reason why. You confirm with one tap, and Faves Buddy learns how you like things filed.</p>
+          <div class="ui-row hm-welcome-actions">
+            <anvil-component type="Button" name="samples_button" prop:text="Load sample faves to explore" prop:role='["btn", "btn-primary", "ic-sparkle"]'></anvil-component>
+            <a class="ui-btn" href="#tools/import"><i class="ic ic-upload"></i>Import bookmarks</a>
+          </div>
+        </div>
+        <div class="hm-ways">
+          <div class="hm-way"><i class="ic ic-puzzle"></i><div><b>Save tabs from Chrome</b><div class="muted small">One click for this tab, or the whole window at once. <a href="#tools">Get the extension</a></div></div></div>
+          <div class="hm-way"><i class="ic ic-pin"></i><div><b>Paste a Google Maps link</b><div class="muted small">It becomes a pin on your map, with the place's type and hours.</div></div></div>
+          <div class="hm-way"><i class="ic ic-image"></i><div><b>Drop in screenshots</b><div class="muted small">The text in them is read on your device, so a poster becomes an event.</div></div></div>
+          <div class="hm-way"><i class="ic ic-phone"></i><div><b>Tidy up on your phone</b><div class="muted small">Share a pile of tabs or screenshots from your phone and swipe through them. <a href="#tidy">How</a></div></div></div>
+        </div>
+      </div>
+
+      <div anvil:name="collection">
+        <div anvil:name="soon_part">
+          <div class="fb-section"><h2>Coming up</h2></div>
+          <anvil-component type="RepeatingPanel" name="soon_panel" prop:item_template="Faves_Buddy.Items.FaveCard" prop:role='["hm-row"]'></anvil-component>
+        </div>
+
+        <div anvil:name="top_part">
+          <div class="fb-section"><h2>Top faves around you</h2><a href="#discover/top" class="small">More →</a></div>
+          <anvil-component type="Label" name="top_note" prop:role='["fine-print", "hm-top-note"]'></anvil-component>
+          <anvil-component type="RepeatingPanel" name="top_panel" prop:item_template="Faves_Buddy.Items.TopCard" prop:role='["hm-row"]'></anvil-component>
+        </div>
+
+        <div anvil:name="redis_part">
+          <div class="fb-section"><h2>Rediscover</h2><span class="muted small">Something you saved a while ago</span></div>
+          <div class="fb-panel hm-redis">
+            <anvil-component type="Faves_Buddy.Components.Cover" name="redis_cover"></anvil-component>
+            <div>
+              <anvil-component type="Label" name="redis_title" prop:role='["hm-redis-title"]'></anvil-component>
+              <anvil-component type="Label" name="redis_meta" prop:role='["fine-print"]'></anvil-component>
+              <anvil-component type="Label" name="redis_desc" prop:role='["hm-redis-desc"]'></anvil-component>
+              <div class="ui-row">
+                <a class="ui-btn primary" anvil:name="redis_open" href="#home">Open it</a>
+                <anvil-component type="Button" name="redis_archive" prop:text="Not anymore" prop:role='["btn", "ic-archive"]'></anvil-component>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="fb-section"><h2>Your lists</h2><a href="#lists" class="small">All lists →</a></div>
+        <anvil-component type="RepeatingPanel" name="lists_panel" prop:item_template="Faves_Buddy.Items.HomeList" prop:role='["hm-row"]'></anvil-component>
+
+        <div class="fb-section"><h2>Everything you kept</h2><anvil-component type="Label" name="total_label" prop:role='["fine-print"]'></anvil-component></div>
+        <div class="hm-filters">
+          <div class="hm-filter-row">
+            <anvil-component type="TextBox" name="search_box" prop:type="search" prop:placeholder="Search titles, notes, text in pictures…" prop:role='["hm-search"]'></anvil-component>
+            <anvil-component type="DropDown" name="kind_box" prop:role='["hm-select"]'></anvil-component>
+            <anvil-component type="DropDown" name="status_box" prop:role='["hm-select"]'></anvil-component>
+            <anvil-component type="DropDown" name="sort_box" prop:role='["hm-select"]'></anvil-component>
+          </div>
+          <div role="group" aria-label="Categories">
+            <anvil-component type="RepeatingPanel" name="cat_chips" prop:item_template="Faves_Buddy.Items.Chip" prop:role='["fb-chips", "scroll"]'></anvil-component>
+          </div>
+          <anvil-component type="RepeatingPanel" name="tag_chips" prop:item_template="Faves_Buddy.Items.Chip" prop:role='["hm-tagcloud"]'></anvil-component>
+        </div>
+        <anvil-component type="RepeatingPanel" name="grid" prop:item_template="Faves_Buddy.Items.FaveCard" prop:role='["fb-grid"]'></anvil-component>
+        <div class="ui-empty" anvil:name="no_match"><i class="ic ic-search"></i><h3>Nothing matches</h3><p>Try another category or clear the search.</p></div>
+        <div class="ui-row hm-more" anvil:name="more_row">
+          <anvil-component type="Button" name="more_button" prop:text="Show more" prop:role='["btn"]'></anvil-component>
+        </div>
+        <p class="muted small hm-samples-note" anvil:name="samples_note"><i class="ic ic-info"></i> Some faves are samples. Remove them anytime in <a href="#tools/samples">Tools</a>.</p>
+      </div>
+    </div>
+  </anvil-block>
+</anvil-form>

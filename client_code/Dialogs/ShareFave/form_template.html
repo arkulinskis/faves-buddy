@@ -1,0 +1,21 @@
+<div class="ui fb-dialog">
+  <anvil-component type="Label" name="heading" prop:role='["dlg-title"]'></anvil-component>
+  <p class="muted">Anyone with the link can see this fave: its title, picture, link or place. Your note and tags stay private. To keep it, they make a free account and save it to their own faves.</p>
+  <div class="ui-row between sh-block">
+    <b>Share with a link</b>
+    <anvil-component type="CheckBox" name="on_box" prop:text="On"></anvil-component>
+  </div>
+  <div anvil:name="link_part">
+    <div class="ui-row sh-link">
+      <anvil-component type="TextBox" name="link_box" prop:role='["grow-box"]'></anvil-component>
+      <anvil-component type="Button" name="copy_button" prop:text="Copy link" prop:role='["btn", "btn-primary", "ic-copy"]'></anvil-component>
+    </div>
+    <div class="ui-row sh-more">
+      <anvil-component type="Button" name="native_button" prop:text="Share…" prop:role='["btn", "ic-share"]'></anvil-component>
+      <a class="ui-btn" anvil:name="mail_link"><i class="ic ic-mail"></i>Email it</a>
+      <a class="ui-btn" anvil:name="sms_link"><i class="ic ic-chat"></i>Text it</a>
+    </div>
+    <p class="muted small">Turn the link off anytime: it stops working straight away.</p>
+  </div>
+  <div class="ui-row end"><anvil-component type="Button" name="done_button" prop:text="Done" prop:role='["btn", "btn-ghost"]'></anvil-component></div>
+</div>

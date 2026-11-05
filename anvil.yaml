@@ -191,6 +191,11 @@ db_schema:
         width: 200
       name: is_sample
       type: bool
+    - admin_ui:
+        order: 34
+        width: 200
+      name: share_token
+      type: string
     indexes: []
     server: full
     title: Faves
@@ -547,58 +552,72 @@ metadata:
   title: 'Faves Buddy: save tabs, map pins and screenshots, sorted'
 name: Faves Buddy
 native_deps:
-  head_html: "<script src=\"_/theme/legal-kit.js?v=db6f50d798\"></script>\n<!-- seo:start (APP_MAKER/seo: edit seo/apps/favesbuddy.json\
-    \ and run seo.py, not here) -->\n<link rel=\"canonical\" href=\"https://faves-buddy.anvil.app/\">\n<meta name=\"robots\"\
-    \ content=\"index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1\">\n<meta name=\"keywords\" content=\"\
-    save open tabs, bookmark manager, save Google Maps pins, screenshot organizer, read later app, tab manager Chrome extension,\
-    \ personal collection app, places to visit list, Pocket alternative\">\n<meta name=\"author\" content=\"Arkvital\">\n\
-    <meta property=\"og:type\" content=\"website\">\n<meta property=\"og:site_name\" content=\"Faves Buddy\">\n<meta property=\"\
-    og:title\" content=\"Faves Buddy: save tabs, map pins and screenshots, sorted\">\n<meta property=\"og:description\" content=\"\
-    Tame your open tabs, map pins, screenshots and ideas. Faves Buddy sorts them for you without AI, shows what&#x27;s near\
-    \ you and finds more you will love.\">\n<meta property=\"og:locale\" content=\"en_CA\">\n<meta property=\"og:url\" content=\"\
-    https://faves-buddy.anvil.app/\">\n<meta property=\"og:image\" content=\"https://faves-buddy.anvil.app/_/theme/og-image.png\"\
-    >\n<meta property=\"og:image:width\" content=\"1200\"><meta property=\"og:image:height\" content=\"630\">\n<meta property=\"\
-    og:image:alt\" content=\"Faves Buddy: Your open tabs, map pins, screenshots and ideas, sorted for you\">\n<meta name=\"\
-    twitter:card\" content=\"summary_large_image\">\n<meta name=\"twitter:title\" content=\"Faves Buddy: save tabs, map pins\
-    \ and screenshots, sorted\">\n<meta name=\"twitter:description\" content=\"Tame your open tabs, map pins, screenshots\
-    \ and ideas. Faves Buddy sorts them for you without AI, shows what&#x27;s near you and finds more you will love.\">\n\
-    <meta name=\"twitter:image\" content=\"https://faves-buddy.anvil.app/_/theme/og-image.png\">\n<link rel=\"alternate\"\
-    \ type=\"text/plain\" title=\"Faves Buddy for AI assistants\" href=\"https://faves-buddy.anvil.app/llms.txt\">\n<script\
-    \ type=\"application/ld+json\">{\"@context\": \"https://schema.org\", \"@graph\": [{\"@type\": \"WebApplication\", \"\
-    @id\": \"https://faves-buddy.anvil.app/#app\", \"name\": \"Faves Buddy\", \"url\": \"https://faves-buddy.anvil.app/\"\
-    , \"description\": \"Tame your open tabs, map pins, screenshots and ideas. Faves Buddy sorts them for you without AI,\
-    \ shows what's near you and finds more you will love.\", \"image\": \"https://faves-buddy.anvil.app/_/theme/og-image.png\"\
-    , \"inLanguage\": \"en\", \"publisher\": {\"@id\": \"https://arkvital.com/#org\"}, \"keywords\": \"save open tabs, bookmark\
-    \ manager, save Google Maps pins, screenshot organizer, read later app, tab manager Chrome extension, personal collection\
-    \ app, places to visit list, Pocket alternative\", \"applicationCategory\": \"UtilitiesApplication\", \"operatingSystem\"\
-    : \"Any (web browser)\", \"browserRequirements\": \"Requires JavaScript and a modern web browser\", \"featureList\": [\"\
-    Save tabs, whole windows, Maps pins, screenshots, notes and ideas\", \"Automatic sorting without AI that learns how you\
-    \ file\", \"A map of your places with open now\", \"Discover: more of what you love, from open data\", \"Shareable lists\"\
-    , \"A Chrome extension\"], \"audience\": {\"@type\": \"Audience\", \"audienceType\": \"People with too many open tabs,\
-    \ saved places and screenshots\"}}, {\"@type\": \"WebSite\", \"@id\": \"https://faves-buddy.anvil.app/#site\", \"url\"\
-    : \"https://faves-buddy.anvil.app/\", \"name\": \"Faves Buddy\", \"publisher\": {\"@id\": \"https://arkvital.com/#org\"\
-    }}, {\"@type\": \"Organization\", \"@id\": \"https://arkvital.com/#org\", \"name\": \"Arkvital\", \"url\": \"https://arkvital.com\"\
-    , \"email\": \"arkvital@outlook.com\", \"address\": {\"@type\": \"PostalAddress\", \"addressLocality\": \"Montreal\",\
-    \ \"addressRegion\": \"QC\", \"addressCountry\": \"CA\"}}]}</script>\n<!-- seo:end -->\n<meta name=\"viewport\" content=\"\
-    width=device-width, initial-scale=1, viewport-fit=cover\">\n<meta name=\"theme-color\" content=\"#f4f6fb\">\n<meta name=\"\
-    apple-mobile-web-app-capable\" content=\"yes\">\n<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n<link\
-    \ rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n<link href=\"https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Nunito:wght@700;800;900&display=swap\"\
-    \ rel=\"stylesheet\">\n<link id=\"ui-favicon\" rel=\"icon\" type=\"image/svg+xml\" href=\"_/theme/icon.svg?v=b0262bd66d\"\
-    >\n<link rel=\"apple-touch-icon\" href=\"_/theme/icon-180.png?v=b0262bd66d\">\n<script>\n/* Keep our tab icon: Anvil adds\
-    \ its own <link rel=\"icon\">, so drop any other icon link. */\n(function () {\n  function keep() {\n    var ours = document.getElementById('ui-favicon');\n\
-    \    if (!ours) return;\n    document.querySelectorAll('link[rel~=\"icon\"]').forEach(function (l) { if (l !== ours) l.remove();\
-    \ });\n  }\n  keep();\n  document.addEventListener('DOMContentLoaded', keep);\n  window.addEventListener('load', keep);\n\
-    })();\n/* Our web manifest (server_code/Tidy.py: manifest) adds a share target, so the installed app shows up in Android's\n\
-    \   share sheet for tabs, links and screenshots. Anvil adds its own <link rel=\"manifest\">; point it at ours. */\n(function\
-    \ () {\n  var href = '_/api/manifest.json';\n  function swap() {\n    var links = document.querySelectorAll('link[rel=\"\
-    manifest\"]');\n    if (!links.length) { var l = document.createElement('link'); l.rel = 'manifest'; l.href = href; document.head.appendChild(l);\
-    \ return; }\n    links.forEach(function (l, i) { if (i) l.remove(); else if (l.getAttribute('href') !== href) l.setAttribute('href',\
-    \ href); });\n  }\n  swap();\n  document.addEventListener('DOMContentLoaded', swap);\n})();\nwindow.addEventListener('beforeinstallprompt',\
-    \ function (e) { e.preventDefault(); window.fbInstallPrompt = e; });\n</script>\n\n<!-- Prepsto feedback panel: every\
-    \ \"Submit feedback\" link and button opens it (it is the only feedback channel). No floating button, no cookies, nothing\
-    \ loads until it is opened. Codes: APP_MAKER/prepsto-links.json -->\n<script src=\"https://prepsto.com/_/theme/widget.js\"\
-    \ data-prepsto=\"vef7qyr\" data-button=\"false\" data-label=\"Submit feedback\" async></script>\n<link rel=\"stylesheet\"\
-    \ href=\"_/theme/app.css?v=37450c9189\">\n<script src=\"_/theme/app.js?v=285ea12a18\"></script>\n"
+  head_html: |
+    <script src="_/theme/legal-kit.js?v=013a0f87eb"></script>
+    <!-- seo:start (APP_MAKER/seo: edit seo/apps/favesbuddy.json and run seo.py, not here) -->
+    <link rel="canonical" href="https://faves-buddy.anvil.app/">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta name="keywords" content="save open tabs, bookmark manager, save Google Maps pins, screenshot organizer, read later app, tab manager Chrome extension, personal collection app, places to visit list, Pocket alternative">
+    <meta name="author" content="Arkvital">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Faves Buddy">
+    <meta property="og:title" content="Faves Buddy: save tabs, map pins and screenshots, sorted">
+    <meta property="og:description" content="Tame your open tabs, map pins, screenshots and ideas. Faves Buddy sorts them for you without AI, shows what&#x27;s near you and finds more you will love.">
+    <meta property="og:locale" content="en_CA">
+    <meta property="og:url" content="https://faves-buddy.anvil.app/">
+    <meta property="og:image" content="https://faves-buddy.anvil.app/_/theme/og-image.png">
+    <meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Faves Buddy: Your open tabs, map pins, screenshots and ideas, sorted for you">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Faves Buddy: save tabs, map pins and screenshots, sorted">
+    <meta name="twitter:description" content="Tame your open tabs, map pins, screenshots and ideas. Faves Buddy sorts them for you without AI, shows what&#x27;s near you and finds more you will love.">
+    <meta name="twitter:image" content="https://faves-buddy.anvil.app/_/theme/og-image.png">
+    <link rel="alternate" type="text/plain" title="Faves Buddy for AI assistants" href="https://faves-buddy.anvil.app/llms.txt">
+    <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "WebApplication", "@id": "https://faves-buddy.anvil.app/#app", "name": "Faves Buddy", "url": "https://faves-buddy.anvil.app/", "description": "Tame your open tabs, map pins, screenshots and ideas. Faves Buddy sorts them for you without AI, shows what's near you and finds more you will love.", "image": "https://faves-buddy.anvil.app/_/theme/og-image.png", "inLanguage": "en", "publisher": {"@id": "https://arkvital.com/#org"}, "keywords": "save open tabs, bookmark manager, save Google Maps pins, screenshot organizer, read later app, tab manager Chrome extension, personal collection app, places to visit list, Pocket alternative", "applicationCategory": "UtilitiesApplication", "operatingSystem": "Any (web browser)", "browserRequirements": "Requires JavaScript and a modern web browser", "featureList": ["Save tabs, whole windows, Maps pins, screenshots, notes and ideas", "Automatic sorting without AI that learns how you file", "A map of your places with open now", "Discover: more of what you love, from open data", "Shareable lists", "A Chrome extension"], "audience": {"@type": "Audience", "audienceType": "People with too many open tabs, saved places and screenshots"}}, {"@type": "WebSite", "@id": "https://faves-buddy.anvil.app/#site", "url": "https://faves-buddy.anvil.app/", "name": "Faves Buddy", "publisher": {"@id": "https://arkvital.com/#org"}}, {"@type": "Organization", "@id": "https://arkvital.com/#org", "name": "Arkvital", "url": "https://arkvital.com", "email": "arkvital@outlook.com", "address": {"@type": "PostalAddress", "addressLocality": "Montreal", "addressRegion": "QC", "addressCountry": "CA"}}]}</script>
+    <!-- seo:end -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#f4f6fb">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+    <link id="ui-favicon" rel="icon" type="image/svg+xml" href="_/theme/icon.svg?v=97bd0907ae">
+    <link rel="apple-touch-icon" href="_/theme/icon-180.png?v=4b4f6f288e">
+    <script>
+    /* Keep our tab icon: Anvil adds its own <link rel="icon">, so drop any other icon link. */
+    (function () {
+      function keep() {
+        var ours = document.getElementById('ui-favicon');
+        if (!ours) return;
+        document.querySelectorAll('link[rel~="icon"]').forEach(function (l) { if (l !== ours) l.remove(); });
+      }
+      keep();
+      document.addEventListener('DOMContentLoaded', keep);
+      window.addEventListener('load', keep);
+    })();
+    /* Our web manifest (server_code/Tidy.py: manifest) adds a share target, so the installed app shows up in Android's
+       share sheet for tabs, links and screenshots. Anvil adds its own <link rel="manifest">; point it at ours. */
+    (function () {
+      var href = '_/api/manifest.json';
+      function swap() {
+        var links = document.querySelectorAll('link[rel="manifest"]');
+        if (!links.length) { var l = document.createElement('link'); l.rel = 'manifest'; l.href = href; document.head.appendChild(l); return; }
+        links.forEach(function (l, i) { if (i) l.remove(); else if (l.getAttribute('href') !== href) l.setAttribute('href', href); });
+      }
+      swap();
+      document.addEventListener('DOMContentLoaded', swap);
+    })();
+    window.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); window.fbInstallPrompt = e; });
+    </script>
+
+    <!-- Prepsto feedback panel: every "Submit feedback" link and button opens it (it is the only feedback channel). No floating button, no cookies, nothing loads until it is opened. Codes: APP_MAKER/prepsto-links.json -->
+    <script src="https://prepsto.com/_/theme/widget.js" data-prepsto="vef7qyr" data-button="false" data-label="Submit feedback" async></script>
+    <link rel="stylesheet" href="_/theme/icons.css?v=65344ad6d0">
+    <link rel="stylesheet" href="_/theme/app.css?v=8a0d94cfb2">
+    <script src="_/theme/app-kit.js?v=09bf12029d"></script>
+    <script src="_/theme/fb-engine.js?v=a5bf53d8e9"></script>
+    <script src="_/theme/fb-map.js?v=30c74f4db6"></script>
+    <script src="_/theme/fb-media.js?v=d9a5dba4fa"></script>
 package_name: Faves_Buddy
 runtime_options:
   client_version: '3'
@@ -629,5 +648,5 @@ services:
   server_config: {}
   source: /runtime/services/google.yml
 startup:
-  module: Main
-  type: form
+  module: startup
+  type: module

@@ -1,0 +1,18 @@
+<div class="fb-panel tb-set">
+  <div class="tb-head">
+    <div class="tb-name">
+      <anvil-component type="TextBox" name="name_box" prop:role='["tb-name-box"]'></anvil-component>
+      <anvil-component type="Label" name="info" prop:role='["fine-print"]'></anvil-component>
+    </div>
+    <div class="ui-row">
+      <anvil-component type="Button" name="open_button" prop:text="Open all" prop:role='["btn", "btn-sm", "btn-primary", "ic-external"]'></anvil-component>
+      <anvil-component type="Button" name="copy_button" prop:text="Copy links" prop:role='["btn", "btn-sm", "ic-copy"]'></anvil-component>
+      <anvil-component type="Button" name="keep_button" prop:text="Keep all" prop:role='["btn", "btn-sm", "ic-check"]'></anvil-component>
+      <anvil-component type="Button" name="delete_button" prop:text="Delete set" prop:tooltip="Delete set" prop:role='["btn", "btn-sm", "btn-icon", "btn-danger", "ic-trash"]'></anvil-component>
+    </div>
+  </div>
+  <anvil-component type="RepeatingPanel" name="cats" prop:item_template="Faves_Buddy.Items.Chip" prop:role='["tb-cats"]'></anvil-component>
+  <details><summary class="small muted">Show the tabs</summary>
+    <anvil-component type="RepeatingPanel" name="links" prop:item_template="Faves_Buddy.Items.TabLink" prop:role='["tb-links"]'></anvil-component>
+  </details>
+</div>

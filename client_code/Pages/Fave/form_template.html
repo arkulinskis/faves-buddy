@@ -1,0 +1,131 @@
+<anvil-form layout="Faves_Buddy.Layouts.Shell">
+  <anvil-block slot="content">
+    <div class="ui-wrap">
+      <a class="small" anvil:name="back" href="#home"><i class="ic ic-back"></i> <span anvil:dom-node="back_text">Your faves</span></a>
+      <div class="fv-top">
+        <div>
+          <div class="fv-pic"><anvil-component type="Faves_Buddy.Components.Cover" name="cover"></anvil-component></div>
+          <div class="ui-row fv-repic" anvil:name="repic_row"><label class="ui-btn sm"><i class="ic ic-camera"></i>Replace picture<input type="file" accept="image/*" hidden anvil:dom-node="repic"></label></div>
+        </div>
+        <div>
+          <div class="ui-row fv-badges">
+            <span class="fb-cat"><span class="dot" anvil:dom-node="cat_dot"></span><span anvil:dom-node="cat_name"></span></span>
+            <anvil-component type="Label" name="status_badge" prop:role='["badge"]'></anvil-component>
+            <anvil-component type="Label" name="owner_badge" prop:role='["badge"]'></anvil-component>
+            <anvil-component type="Label" name="stage_badge" prop:role='["badge"]'></anvil-component>
+          </div>
+          <anvil-component type="TextBox" name="title_box" prop:role='["fv-title-box"]'></anvil-component>
+          <anvil-component type="Label" name="title_label" prop:role='["fv-title"]'></anvil-component>
+          <div class="ui-row fv-links">
+            <a class="ui-btn primary" anvil:name="open_link" target="_blank" rel="noopener" anvil:on-dom:click="self.open_click"><i class="ic ic-external"></i><span anvil:dom-node="open_text">Open</span></a>
+            <a class="ui-btn" anvil:name="dir_link" target="_blank" rel="noopener"><i class="ic ic-compass"></i>Directions</a>
+            <a class="ui-btn" anvil:name="osm_link" target="_blank" rel="noopener"><i class="ic ic-map"></i>OpenStreetMap</a>
+          </div>
+          <anvil-component type="Label" name="desc" prop:role='["fine-print", "fv-desc"]'></anvil-component>
+          <anvil-component type="RepeatingPanel" name="facts" prop:item_template="Faves_Buddy.Items.Fact" prop:role='["fv-facts"]'></anvil-component>
+
+          <div anvil:name="owner_part">
+            <div class="fv-sec"><span class="lbl">Status</span>
+              <div class="ui-row">
+                <div class="ui-seg" role="group" aria-label="Status">
+                  <button type="button" anvil:name="stage_want" data-stage="want" anvil:on-dom:click="self.stage_click"><span anvil:dom-node="stage_want_t">Want</span></button>
+                  <button type="button" anvil:name="stage_been" data-stage="been" anvil:on-dom:click="self.stage_click"><span anvil:dom-node="stage_been_t">Been</span></button>
+                  <button type="button" anvil:name="stage_loved" data-stage="loved" anvil:on-dom:click="self.stage_click"><span anvil:dom-node="stage_loved_t">Loved it</span></button>
+                </div>
+                <div class="fv-stars" role="group" aria-label="Rating">
+                  <button type="button" anvil:name="star1" data-star="1" aria-label="1 star" anvil:on-dom:click="self.star_click"><i class="ic ic-star"></i></button>
+                  <button type="button" anvil:name="star2" data-star="2" aria-label="2 stars" anvil:on-dom:click="self.star_click"><i class="ic ic-star"></i></button>
+                  <button type="button" anvil:name="star3" data-star="3" aria-label="3 stars" anvil:on-dom:click="self.star_click"><i class="ic ic-star"></i></button>
+                  <button type="button" anvil:name="star4" data-star="4" aria-label="4 stars" anvil:on-dom:click="self.star_click"><i class="ic ic-star"></i></button>
+                  <button type="button" anvil:name="star5" data-star="5" aria-label="5 stars" anvil:on-dom:click="self.star_click"><i class="ic ic-star"></i></button>
+                </div>
+              </div>
+            </div>
+            <div class="fv-sec"><span class="lbl">Category</span>
+              <div class="fb-why"><anvil-component type="Label" name="why_text"></anvil-component><anvil-component type="RepeatingPanel" name="why_panel" prop:item_template="Faves_Buddy.Items.Reason" prop:role='["contents"]'></anvil-component></div>
+              <div class="fv-picker"><anvil-component type="Faves_Buddy.Components.CatPicker" name="picker"></anvil-component></div>
+              <anvil-component type="Button" name="resort_button" prop:text="Let Faves Buddy sort it again" prop:role='["btn", "btn-sm", "btn-ghost", "ic-refresh"]'></anvil-component>
+            </div>
+            <div class="fv-sec"><span class="lbl">Tags</span>
+              <div class="fv-tags">
+                <anvil-component type="RepeatingPanel" name="tags_panel" prop:item_template="Faves_Buddy.Items.EditTag" prop:role='["contents"]'></anvil-component>
+                <anvil-component type="TextBox" name="tag_box" prop:placeholder="+ tag" prop:role='["fv-tag-box"]'></anvil-component>
+              </div>
+            </div>
+            <div class="fv-sec"><span class="lbl">Lists</span>
+              <div class="ui-row">
+                <anvil-component type="RepeatingPanel" name="lists_panel" prop:item_template="Faves_Buddy.Items.Chip" prop:role='["contents"]'></anvil-component>
+                <anvil-component type="Button" name="lists_button" prop:text="Add to a list" prop:role='["btn", "btn-sm", "ic-plus"]'></anvil-component>
+              </div>
+            </div>
+            <div class="fv-sec"><span class="lbl">Note</span>
+              <anvil-component type="TextArea" name="note_box" prop:placeholder="Why you saved it, who told you, what to order…" prop:height="110"></anvil-component>
+            </div>
+            <div class="fv-sec" anvil:name="keep_part"><anvil-component type="Button" name="keep_button" prop:role='["btn", "btn-primary", "ic-check"]'></anvil-component></div>
+          </div>
+
+          <div anvil:name="viewer_part">
+            <div class="fv-sec" anvil:name="viewer_note_part"><span class="lbl">Note</span><anvil-component type="Label" name="viewer_note"></anvil-component></div>
+            <div class="fv-sec"><anvil-component type="Button" name="copy_button" prop:text="Save to my faves" prop:role='["btn", "btn-primary", "ic-heart"]'></anvil-component></div>
+          </div>
+        </div>
+      </div>
+
+      <div anvil:name="map_part">
+        <div class="fb-section"><h2>On the map</h2><anvil-component type="Button" name="similar_button" prop:text="More like this nearby" prop:role='["btn", "btn-sm", "ic-sparkle"]'></anvil-component></div>
+        <anvil-component type="Faves_Buddy.Components.MapView" name="map" prop:role='["fv-map"]'></anvil-component>
+        <anvil-component type="Label" name="similar_note" prop:role='["fine-print", "fv-similar-note"]'></anvil-component>
+        <anvil-component type="RepeatingPanel" name="similar_panel" prop:item_template="Faves_Buddy.Items.Chip" prop:role='["fb-chips"]'></anvil-component>
+      </div>
+
+      <div anvil:name="locate_part">
+        <div class="fb-section"><h2>Where is it?</h2></div>
+        <div class="ui-row">
+          <anvil-component type="TextBox" name="locate_box" prop:role='["grow-box"]'></anvil-component>
+          <anvil-component type="Button" name="locate_button" prop:text="Find" prop:role='["btn", "ic-search"]'></anvil-component>
+        </div>
+        <anvil-component type="Label" name="locate_none" prop:text="No match. Try the street or neighbourhood." prop:role='["fine-print"]' prop:visible="false"></anvil-component>
+        <anvil-component type="RepeatingPanel" name="locate_panel" prop:item_template="Faves_Buddy.Items.Chip" prop:role='["fb-chips", "fv-locate"]'></anvil-component>
+      </div>
+
+      <div anvil:name="photo_part">
+        <div class="fb-section"><h2>In the picture</h2></div>
+        <div class="fb-panel ui-stack">
+          <div anvil:name="ocr_part"><b>Text read from it</b><anvil-component type="Label" name="ocr_text" prop:role='["fv-ocr"]'></anvil-component></div>
+          <p class="muted" anvil:name="ocr_none">The text in this picture hasn't been read yet.</p>
+          <div anvil:name="found_part"><b>Found in it</b><anvil-component type="Faves_Buddy.Components.Found" name="found"></anvil-component></div>
+          <div anvil:name="ai_part"><b>AI description</b><anvil-component type="Label" name="ai_text"></anvil-component></div>
+          <div anvil:name="photo_tools">
+            <div class="ui-row">
+              <anvil-component type="Button" name="ocr_button" prop:role='["btn", "ic-text"]'></anvil-component>
+              <anvil-component type="Button" name="ai_button" prop:text="Describe with AI" prop:role='["btn", "ic-wand"]'></anvil-component>
+            </div>
+            <div anvil:name="ocr_progress">
+              <anvil-component type="Label" name="ocr_status" prop:role='["fine-print"]'></anvil-component>
+              <div class="fv-progress"><i anvil:dom-node="ocr_fill"></i></div>
+            </div>
+            <anvil-component type="Faves_Buddy.Components.AiNudge" name="ai_nudge" prop:what="describe pictures, spot places and dates in them"></anvil-component>
+          </div>
+        </div>
+      </div>
+
+      <div anvil:name="selection_part">
+        <div class="fb-section"><h2>Saved from</h2></div>
+        <anvil-component type="Label" name="selection_text" prop:role='["fine-print"]'></anvil-component>
+      </div>
+
+      <div anvil:name="more_part">
+        <div class="fb-section"><h2>More</h2></div>
+        <div class="fv-actions">
+          <anvil-component type="Button" name="share_button" prop:text="Share" prop:role='["btn", "btn-primary", "ic-share"]'></anvil-component>
+          <anvil-component type="Button" name="archive_button" prop:text="Archive" prop:role='["btn", "ic-archive"]'></anvil-component>
+          <anvil-component type="Button" name="unarchive_button" prop:text="Back to inbox" prop:role='["btn", "ic-inbox"]'></anvil-component>
+          <anvil-component type="Button" name="snooze_button" prop:text="Remind me later" prop:role='["btn", "ic-snooze"]'></anvil-component>
+          <anvil-component type="Button" name="delete_button" prop:text="Delete" prop:role='["btn", "btn-danger", "ic-trash"]'></anvil-component>
+        </div>
+      </div>
+      <anvil-component type="Label" name="meta_line" prop:role='["fv-meta"]'></anvil-component>
+      <a class="small fv-tabset" anvil:name="tabset_link" href="#tabs"><i class="ic ic-tabs"></i> <span anvil:dom-node="tabset_name"></span></a>
+    </div>
+  </anvil-block>
+</anvil-form>

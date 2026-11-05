@@ -1,0 +1,22 @@
+<anvil-form layout="Faves_Buddy.Layouts.Shell">
+  <anvil-block slot="content">
+    <div class="ui-wrap td-wrap si-wrap">
+      <div anvil:name="note_part">
+        <div class="ui-page-head"><div><h1>Save this?</h1><p class="muted">You shared some text with Faves Buddy.</p></div></div>
+        <div class="fb-panel ui-stack">
+          <label class="ui-field"><span>Title</span><anvil-component type="TextBox" name="title_box"></anvil-component></label>
+          <label class="ui-field"><span>Details</span><anvil-component type="TextArea" name="note_box" prop:height="120"></anvil-component></label>
+          <div class="ui-row end">
+            <anvil-component type="Button" name="no_button" prop:text="Don't save" prop:role='["btn", "btn-ghost"]'></anvil-component>
+            <anvil-component type="Button" name="save_button" prop:text="Save as a note" prop:role='["btn", "btn-primary", "ic-heart"]'></anvil-component>
+          </div>
+        </div>
+      </div>
+      <div class="fb-panel td-done" anvil:name="gone_part">
+        <div class="big">🤷</div><h2>Nothing to tidy here</h2>
+        <anvil-component type="Label" name="gone_text" prop:role='["fine-print"]'></anvil-component>
+        <a class="ui-btn primary" href="#tidy">Tidy up</a>
+      </div>
+    </div>
+  </anvil-block>
+</anvil-form>

@@ -1,0 +1,18 @@
+<article class="fb-card" anvil:dom-node="card">
+  <button type="button" class="fb-stage" anvil:name="love" anvil:on-dom:click="self.love_click" title="Love it"><i class="ic ic-heart"></i></button>
+  <a class="fb-card-link" anvil:name="link" href="#home">
+    <anvil-component type="Faves_Buddy.Components.Cover" name="cover" prop:pills="true"></anvil-component>
+    <div class="fb-card-body">
+      <h3 anvil:dom-node="title"></h3>
+      <div class="fb-sub"><i class="ic" anvil:name="sub_icon"></i><span anvil:dom-node="sub"></span></div>
+      <div class="fb-sub small fb-meta" anvil:name="meta"><span anvil:dom-node="m_lead"></span><span class="fb-open" anvil:name="m_open">Open now</span><span class="fb-closed" anvil:name="m_closed">Closed now</span><span anvil:dom-node="m_rest"></span></div>
+      <anvil-component type="RepeatingPanel" name="tags" prop:item_template="Faves_Buddy.Items.Tag" prop:role='["fb-tags"]'></anvil-component>
+    </div>
+  </a>
+  <div class="fb-actions" anvil:name="actions">
+    <anvil-component type="Button" name="copy_button" prop:text="Save to mine" prop:role='["btn", "btn-sm", "ic-heart"]'></anvil-component>
+    <anvil-component type="Button" name="remove_button" prop:text="Remove" prop:role='["btn", "btn-sm", "btn-ghost", "ic-x"]'></anvil-component>
+    <a class="ui-btn sm" anvil:name="open_link" target="_blank" rel="noopener"><i class="ic ic-external"></i>Open</a>
+    <a class="ui-btn sm" anvil:name="go_link" target="_blank" rel="noopener"><i class="ic ic-compass"></i>Go</a>
+  </div>
+</article>

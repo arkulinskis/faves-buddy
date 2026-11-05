@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "Faves Buddy",
+  "short_name": "Faves Buddy",
+  "version": "1.1.0",
+  "description": "Save tabs, whole windows, your phone's open tabs, links, pictures and notes to Faves Buddy: sorted, mapped and shared.",
+  "icons": { "16": "icons/icon-16.png", "32": "icons/icon-32.png", "48": "icons/icon-48.png", "128": "icons/icon-128.png" },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Save to Faves Buddy",
+    "default_icon": { "16": "icons/icon-16.png", "32": "icons/icon-32.png", "48": "icons/icon-48.png" }
+  },
+  "background": { "service_worker": "background.js" },
+  "permissions": ["storage", "activeTab", "tabs", "contextMenus", "scripting", "notifications", "sessions"],
+  "commands": {
+    "save-tab": { "suggested_key": { "default": "Alt+Shift+S" }, "description": "Save this tab to Faves Buddy" },
+    "save-window": { "suggested_key": { "default": "Alt+Shift+W" }, "description": "Save every tab in this window as a tab set" }
+  }
+}

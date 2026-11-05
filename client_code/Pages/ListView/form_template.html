@@ -1,0 +1,25 @@
+<anvil-form layout="Faves_Buddy.Layouts.Shell">
+  <anvil-block slot="content">
+    <div class="ui-wrap">
+      <a href="#lists" class="small"><i class="ic ic-back"></i> All lists</a>
+      <div class="lv-head">
+        <span class="em" anvil:name="em" anvil:dom-node="em"></span>
+        <div>
+          <anvil-component type="Label" name="name" prop:role='["page-title"]'></anvil-component>
+          <anvil-component type="Label" name="info" prop:role='["fine-print"]'></anvil-component>
+          <anvil-component type="Label" name="desc" prop:role='["lv-desc"]'></anvil-component>
+        </div>
+        <div class="ui-row acts">
+          <anvil-component type="Button" name="add_button" prop:text="Add faves" prop:role='["btn", "btn-primary", "ic-plus"]'></anvil-component>
+          <anvil-component type="Button" name="share_button" prop:text="Share" prop:role='["btn", "ic-share"]'></anvil-component>
+          <anvil-component type="Button" name="edit_button" prop:text="Edit list" prop:tooltip="Edit" prop:role='["btn", "btn-icon", "ic-edit"]'></anvil-component>
+          <anvil-component type="Button" name="delete_button" prop:text="Delete list" prop:tooltip="Delete list" prop:role='["btn", "btn-icon", "btn-danger", "ic-trash"]'></anvil-component>
+          <anvil-component type="Button" name="leave_button" prop:text="Leave" prop:role='["btn", "ic-logout"]'></anvil-component>
+        </div>
+      </div>
+      <anvil-component type="Faves_Buddy.Components.MapView" name="map" prop:role='["lv-map"]'></anvil-component>
+      <anvil-component type="RepeatingPanel" name="grid" prop:item_template="Faves_Buddy.Items.FaveCard" prop:role='["fb-grid"]'></anvil-component>
+      <div class="ui-empty" anvil:name="empty"><i class="ic ic-grid"></i><h3>This list is empty</h3><anvil-component type="Label" name="empty_text"></anvil-component></div>
+    </div>
+  </anvil-block>
+</anvil-form>

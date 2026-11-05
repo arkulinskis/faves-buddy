@@ -1,0 +1,19 @@
+---
+custom_component: true
+properties:
+  - name: fave
+    type: object
+    description: The fave (title, cat, kind, image, note/desc, event_at, read_min)
+    default_binding_prop: true
+  - name: pills
+    type: boolean
+    default_value: false
+    description: Show the category / date / read-time pills on the picture
+toolbox_item:
+  title: Fave cover
+  group: Faves Buddy
+help_text: |
+  A fave's picture, or a soft gradient tile in its category colour with its emoji (notes and ideas show their text).
+  Drawn by FB.drawCover in theme/assets/fb-engine.js.
+---
+<div class="fb-cover-host"><div class="fb-cover" anvil:dom-node="box"></div></div>

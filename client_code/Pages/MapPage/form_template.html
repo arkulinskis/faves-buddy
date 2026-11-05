@@ -1,0 +1,40 @@
+<anvil-form layout="Faves_Buddy.Layouts.Shell">
+  <anvil-block slot="content">
+    <div class="ui-wrap mp-wrap">
+      <h1 class="ui-sr">Map of your faves</h1>
+      <div class="mp-layout">
+        <div class="mp-map">
+          <anvil-component type="Faves_Buddy.Components.MapView" name="map" prop:role='["mp-mapview"]'></anvil-component>
+          <div class="mp-tools">
+            <div class="mp-search">
+              <anvil-component type="TextBox" name="search_box" prop:type="search" prop:placeholder="Find a place to save…" prop:role='["mp-search-box"]'></anvil-component>
+              <anvil-component type="Button" name="search_button" prop:text="Search" prop:role='["btn", "btn-sm", "btn-icon", "ic-search"]'></anvil-component>
+            </div>
+            <anvil-component type="Button" name="near_button" prop:text="Near me" prop:role='["btn", "btn-sm", "ic-locate"]'></anvil-component>
+            <anvil-component type="Button" name="suggest_button" prop:text="Suggest nearby" prop:role='["btn", "btn-sm", "ic-sparkle"]'></anvil-component>
+            <anvil-component type="Button" name="top_button" prop:text="Top faves" prop:role='["btn", "btn-sm", "ic-star"]'></anvil-component>
+          </div>
+          <div class="mp-results" anvil:name="results">
+            <anvil-component type="RepeatingPanel" name="results_panel" prop:item_template="Faves_Buddy.Items.PlaceResult" prop:role='["contents"]'></anvil-component>
+            <anvil-component type="Button" name="close_results" prop:text="Close" prop:role='["btn", "btn-sm", "btn-ghost", "btn-block"]'></anvil-component>
+          </div>
+        </div>
+        <aside class="mp-side">
+          <div class="fb-panel mp-filters">
+            <div class="ui-row between">
+              <anvil-component type="Label" name="where_label" prop:role='["strong"]'></anvil-component>
+              <anvil-component type="CheckBox" name="open_box" prop:text="Open now" prop:role='["small-check"]'></anvil-component>
+            </div>
+            <anvil-component type="RepeatingPanel" name="radius_chips" prop:item_template="Faves_Buddy.Items.Chip" prop:role='["fb-chips"]'></anvil-component>
+            <anvil-component type="RepeatingPanel" name="cat_chips" prop:item_template="Faves_Buddy.Items.Chip" prop:role='["fb-chips", "scroll"]'></anvil-component>
+            <anvil-component type="DropDown" name="list_box"></anvil-component>
+          </div>
+          <div class="mp-list">
+            <anvil-component type="RepeatingPanel" name="rows" prop:item_template="Faves_Buddy.Items.MapRow" prop:role='["mp-rows"]'></anvil-component>
+            <div class="ui-empty mp-empty" anvil:name="empty"><i class="ic ic-pin"></i><h3>No places here</h3><anvil-component type="Label" name="empty_text" prop:role='["fine-print"]'></anvil-component></div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </anvil-block>
+</anvil-form>

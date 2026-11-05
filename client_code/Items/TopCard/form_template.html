@@ -1,0 +1,15 @@
+<article class="fb-card top-card">
+  <a class="fb-card-link" anvil:name="link" href="#discover">
+    <anvil-component type="Faves_Buddy.Components.Cover" name="cover" prop:pills="true"></anvil-component>
+    <div class="fb-card-body">
+      <h3 anvil:dom-node="title"></h3>
+      <div class="top-people"><i class="ic ic-star"></i><span anvil:dom-node="people"></span></div>
+      <div class="fb-sub small"><span anvil:dom-node="where"></span><span class="fb-open" anvil:name="open"> · Open now</span></div>
+    </div>
+  </a>
+  <div class="fb-actions">
+    <anvil-component type="Button" name="save_button" prop:text="Save" prop:role='["btn", "btn-sm", "btn-primary", "ic-heart"]'></anvil-component>
+    <anvil-component type="Label" name="yours" prop:text="In your faves" prop:role='["badge", "badge-good"]'></anvil-component>
+    <a class="ui-btn sm" anvil:name="go_link" target="_blank" rel="noopener"><i class="ic ic-compass"></i>Directions</a>
+  </div>
+</article>
