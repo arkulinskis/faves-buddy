@@ -15,9 +15,9 @@ spot). Optional bring-your-own-key AI describes pictures; text in pictures is re
 
 **Where it lives:**
 - Folder `C:\Users\arkvi\Documents\CLAUDE\faves-buddy-forms\` = the git clone of **github.com/arkulinskis/faves-buddy**.
-  "git" layout: the folder *is* the Anvil app. Rebuilt as native Forms on branch `forms` (Nov 4 2026); until the user
-  merges it, master and the live app (https://faves-buddy.anvil.app) run the old JavaScript version from the folder
-  `faves-buddy` (source layout, tools/deploy.py). After the merge that folder is retired.
+  "git" layout: the folder *is* the Anvil app; Anvil pulls master, pushing is the deploy. Live: https://faves-buddy.anvil.app.
+  Rebuilt as native Forms on Nov 4 2026 and merged on Nov 5; the old JavaScript folder `faves-buddy` is retired
+  (RETIRED.md; its deploy.py refuses to run).
 - Made the template-forms way (`APP_MAKER\template-forms`); Anvil's agent skills: `APP_MAKER\vendor\anvil-agent-references`.
 - **README.md** lists every feature. Keep it up to date.
 
@@ -123,7 +123,5 @@ lists, list_items, members, prefs (settings: drops, shots_seen, ai_sort, `top_fa
 
 ## Privacy & Terms (legal kit)
 
-From `APP_MAKER/legal-kit`: change `apps/favesbuddy.json`, then there `python -I build.py favesbuddy` and install into this
-folder (`install.APPS["favesbuddy"] = ("faves-buddy-forms", "git"); install.install("favesbuddy", False)` until apps.json
-points here), then `python tools/assets.py`. The facts version is 2026-11-04 (single-fave share links + Top faves):
+From `APP_MAKER/legal-kit`: change `apps/favesbuddy.json`, then there `python -I build.py favesbuddy` and `python -I install.py favesbuddy`, then `python tools/assets.py`. The facts version is 2026-11-04 (single-fave share links + Top faves):
 people review the updated policy on their next visit. Sign-up keeps the tick box (`legal.consent_field()` in Pages/Auth).
