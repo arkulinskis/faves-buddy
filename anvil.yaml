@@ -546,10 +546,9 @@ db_schema:
     server: full
     title: Users
 metadata:
-  description: Tame your open tabs, map pins, screenshots and ideas. Faves Buddy sorts them for you without AI, shows what's
-    near you and finds more you will love.
-  logo_img: asset:icon-512.png
-  title: 'Faves Buddy: save tabs, map pins and screenshots, sorted'
+  description: "Tame your open tabs, map pins, screenshots and ideas. Faves Buddy sorts them for you without AI, shows what's near you and finds more you will love."
+  logo_img: "asset:icon-512.png"
+  title: "Faves Buddy: save tabs, map pins and screenshots, sorted"
 name: Faves Buddy
 native_deps:
   head_html: |
@@ -573,7 +572,7 @@ native_deps:
     <meta name="twitter:description" content="Tame your open tabs, map pins, screenshots and ideas. Faves Buddy sorts them for you without AI, shows what&#x27;s near you and finds more you will love.">
     <meta name="twitter:image" content="https://faves-buddy.anvil.app/_/theme/og-image.png">
     <link rel="alternate" type="text/plain" title="Faves Buddy for AI assistants" href="https://faves-buddy.anvil.app/llms.txt">
-    <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "WebApplication", "@id": "https://faves-buddy.anvil.app/#app", "name": "Faves Buddy", "url": "https://faves-buddy.anvil.app/", "description": "Tame your open tabs, map pins, screenshots and ideas. Faves Buddy sorts them for you without AI, shows what's near you and finds more you will love.", "image": "https://faves-buddy.anvil.app/_/theme/og-image.png", "inLanguage": "en", "publisher": {"@id": "https://arkvital.com/#org"}, "keywords": "save open tabs, bookmark manager, save Google Maps pins, screenshot organizer, read later app, tab manager Chrome extension, personal collection app, places to visit list, Pocket alternative", "applicationCategory": "UtilitiesApplication", "operatingSystem": "Any (web browser)", "browserRequirements": "Requires JavaScript and a modern web browser", "featureList": ["Save tabs, whole windows, Maps pins, screenshots, notes and ideas", "Automatic sorting without AI that learns how you file", "A map of your places with open now", "Discover: more of what you love, from open data", "Shareable lists", "A Chrome extension"], "audience": {"@type": "Audience", "audienceType": "People with too many open tabs, saved places and screenshots"}}, {"@type": "WebSite", "@id": "https://faves-buddy.anvil.app/#site", "url": "https://faves-buddy.anvil.app/", "name": "Faves Buddy", "publisher": {"@id": "https://arkvital.com/#org"}}, {"@type": "Organization", "@id": "https://arkvital.com/#org", "name": "Arkvital", "url": "https://arkvital.com", "email": "arkvital@outlook.com", "address": {"@type": "PostalAddress", "addressLocality": "Montreal", "addressRegion": "QC", "addressCountry": "CA"}}]}</script>
+    <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Service", "@id": "https://faves-buddy.anvil.app/#app", "name": "Faves Buddy", "url": "https://faves-buddy.anvil.app/", "description": "Tame your open tabs, map pins, screenshots and ideas. Faves Buddy sorts them for you without AI, shows what's near you and finds more you will love.", "image": "https://faves-buddy.anvil.app/_/theme/og-image.png", "serviceType": "Your open tabs, map pins, screenshots and ideas, sorted for you", "provider": {"@id": "https://arkvital.com/#org"}, "areaServed": "Worldwide", "availableChannel": {"@type": "ServiceChannel", "serviceUrl": "https://faves-buddy.anvil.app/", "name": "Web browser"}, "availableLanguage": "en", "audience": {"@type": "Audience", "audienceType": "People with too many open tabs, saved places and screenshots"}}, {"@type": "WebSite", "@id": "https://faves-buddy.anvil.app/#site", "url": "https://faves-buddy.anvil.app/", "name": "Faves Buddy", "publisher": {"@id": "https://arkvital.com/#org"}}, {"@type": "Organization", "@id": "https://arkvital.com/#org", "name": "Arkvital", "url": "https://arkvital.com", "email": "arkvital@outlook.com", "address": {"@type": "PostalAddress", "addressLocality": "Montreal", "addressRegion": "QC", "addressCountry": "CA"}}]}</script>
     <!-- seo:end -->
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="theme-color" content="#f4f6fb">
