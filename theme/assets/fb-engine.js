@@ -321,7 +321,7 @@
       if (!e.key) return; // autofill sends keydown with no key
       if (/INPUT|TEXTAREA|SELECT/.test(e.target.tagName || '') || e.target.isContentEditable) return;
       if (document.querySelector('.anvil-modal.in, .modal.in, .anvil-modal[style*="display: block"]')) return;
-      if (handler(e.key.toLowerCase(), e.ctrlKey || e.metaKey) === true) e.preventDefault();
+      if (handler((e.key || '').toLowerCase(), e.ctrlKey || e.metaKey) === true) e.preventDefault();
     }
     document.addEventListener('keydown', k);
     return function () { document.removeEventListener('keydown', k); };
