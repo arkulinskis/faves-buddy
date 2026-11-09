@@ -68,7 +68,8 @@ class Shell(ShellTemplate):
             self.menu.visible = False
 
     def _key(self, event):
-        if event.key == "Escape":
+        # Chrome autofill fires "keydown" as a plain Event with no key
+        if getattr(event, "key", None) == "Escape":
             self.menu.visible = False
 
     @handle("", "show")
