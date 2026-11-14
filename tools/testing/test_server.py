@@ -706,7 +706,7 @@ bad(call("save_top_fave", {"title": ""}))
 as_user(None)
 assert denied("top_faves", 45.52, -73.58, 5) and denied("share_fave", f1["id"], True) and denied("save_top_fave", {})
 
-PUBLIC = {"get_me", "submit_feedback", "legal_state", "legal_accept", "shared_list", "featured_lists", "shared_fave"}
+PUBLIC = {"session_ping", "get_me", "submit_feedback", "legal_state", "legal_accept", "shared_list", "featured_lists", "shared_fave"}
 for name, (f, need) in sorted(anvil.server.CALLABLES.items()):
     if name in PUBLIC:
         continue
