@@ -118,7 +118,7 @@ lists, list_items, members, prefs (settings: drops, shots_seen, ai_sort, `top_fa
   local Docker database make Top faves appear there (Café Lumière): pick cards from `.anvil-role-fb-grid` in tests.
 - Shared fave links: visitors who sign up from #f/<token> get it saved automatically (the token waits in localStorage
   `favesbuddy.pending.fave` while they sign up).
-- Email confirmation is off: whoever first signs up with arkulinskis@gmail.com becomes admin.
+- Email confirmation is off: whoever first signs up with your admin email (App Secret `admin_emails`) becomes admin.
 - Pictures are served at `/_/api/photo?k=<key>`: anyone with the key can view (documented in Privacy).
 
 ## Privacy & Terms (legal kit)

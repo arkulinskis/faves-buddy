@@ -24,6 +24,8 @@ os.environ["ANVIL_APP_YAML"] = str(PROJECT / "anvil.yaml")  # the mock's tables 
 sys.path[:0] = [str(HERE / "mock"), str(_tmp)]
 import anvil.server  # noqa: E402
 import anvil.users  # noqa: E402
+import anvil.secrets  # noqa: E402
+anvil.secrets.SECRETS["admin_emails"] = "admin@example.com"  # the App Secret, faked
 from anvil.tables import app_tables as T  # noqa: E402
 
 M = {p.stem: importlib.import_module("app." + p.stem) for p in sorted((PROJECT / "server_code").glob("*.py"))}
@@ -64,7 +66,7 @@ def person(email, name=None, **kw):
 
 
 # ---------------------------------------------------------------------------------- accounts
-admin = person("arkulinskis@gmail.com", "The Admin")
+admin = person("admin@example.com", "The Admin")
 ana = person("ana@example.com", "Ana")
 bob = person("bob@example.com")
 
@@ -706,7 +708,7 @@ bad(call("save_top_fave", {"title": ""}))
 as_user(None)
 assert denied("top_faves", 45.52, -73.58, 5) and denied("share_fave", f1["id"], True) and denied("save_top_fave", {})
 
-PUBLIC = {"session_ping", "get_me", "submit_feedback", "legal_state", "legal_accept", "shared_list", "featured_lists", "shared_fave"}
+PUBLIC = {"log_client_error", "session_ping", "get_me", "submit_feedback", "legal_state", "legal_accept", "shared_list", "featured_lists", "shared_fave"}
 for name, (f, need) in sorted(anvil.server.CALLABLES.items()):
     if name in PUBLIC:
         continue
