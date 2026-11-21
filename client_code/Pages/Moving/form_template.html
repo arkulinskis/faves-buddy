@@ -1,0 +1,36 @@
+<anvil-form layout="Faves_Buddy.Layouts.Shell">
+  <anvil-block slot="content">
+    <div class="ui-wrap mv-wrap">
+      <section class="mv-hero">
+        <div class="mv-logos" aria-hidden="true"><span>📥</span><i class="ic ic-arrow"></i><img src="_/theme/icon.svg" alt="" width="56" height="56"></div>
+        <h1>Pocket closed. Your saves deserve a better home.</h1>
+        <p class="muted mv-lead">Bring years of saved articles, videos and links from Pocket, Raindrop.io, Instapaper, OneTab or your browser's bookmarks. Faves Buddy keeps when you saved each one, your tags and folders, and what you had already archived. Then it sorts the lot for you, without AI, and helps you actually get back to them.</p>
+        <div class="ui-row mv-cta">
+          <a class="ui-btn primary lg" href="#tools/import"><i class="ic ic-upload"></i><span anvil:dom-node="cta_text">Start free, then import</span></a>
+          <a class="ui-btn lg" href="#landing" anvil:name="tour_link">What is Faves Buddy?</a>
+        </div>
+        <p class="muted small">Free. Your data stays yours: export everything anytime as JSON, CSV or a bookmarks file.</p>
+      </section>
+
+      <section class="mv-steps">
+        <h2>Where to find your export</h2>
+        <div class="mv-grid">
+          <div class="fb-panel mv-card"><h3>📥 Pocket</h3><p>Pocket shut down in July 2025 and its export closed in October 2025. If you downloaded your export, unzip it and drop the <b>.csv</b> file inside (often <i>part_000000.csv</i>) into Import.</p><p class="muted small">Kept: saved date, tags, archived items (they go to Archived, not your inbox).</p></div>
+          <div class="fb-panel mv-card"><h3>💧 Raindrop.io</h3><p>Settings → <b>Backups</b> (or Export) → <b>CSV</b>. Drop the file into Import.</p><p class="muted small">Kept: saved date, folders as tags, tags, notes, highlights, excerpts, favourites (marked Loved).</p></div>
+          <div class="fb-panel mv-card"><h3>📰 Instapaper</h3><p>Settings → <b>Export</b> → <b>Download .CSV file</b>. Drop it into Import.</p><p class="muted small">Kept: saved date, folders as tags, the text you selected, archived and starred items.</p></div>
+          <div class="fb-panel mv-card"><h3>🗂️ OneTab, bookmarks, Google Maps</h3><p>OneTab's export text, any browser's bookmarks file (HTML), or Google Takeout saved places. Folders become tags, places land on your map.</p></div>
+        </div>
+      </section>
+
+      <section class="mv-why">
+        <h2>Not just another pile</h2>
+        <div class="mv-grid">
+          <div class="mv-point"><i class="ic ic-sparkle"></i><div><b>Sorted for you, with reasons</b><p class="muted small">Twenty categories, from recipes to reads to cafés. Every suggestion says why. No AI needed.</p></div></div>
+          <div class="mv-point"><i class="ic ic-refresh"></i><div><b>Revisit, not hoard</b><p class="muted small">A short “still want this?” deck of things you never opened, with reads that fit the time you have.</p></div></div>
+          <div class="mv-point"><i class="ic ic-link"></i><div><b>Link health</b><p class="muted small">Finds the links that moved or vanished, and points you to a saved copy while there's still one.</p></div></div>
+          <div class="mv-point"><i class="ic ic-map"></i><div><b>Places on a map</b><p class="muted small">Saved restaurants and spots show up near you, with “open now” from real opening hours.</p></div></div>
+        </div>
+      </section>
+    </div>
+  </anvil-block>
+</anvil-form>

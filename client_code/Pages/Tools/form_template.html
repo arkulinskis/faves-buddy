@@ -8,6 +8,7 @@
           <a href="#tools/phone" anvil:name="n_phone"><i class="ic ic-phone"></i>On your phone</a>
           <a href="#tools/import" anvil:name="n_import"><i class="ic ic-upload"></i>Import</a>
           <a href="#tools/export" anvil:name="n_export"><i class="ic ic-download"></i>Export</a>
+          <a href="#tools/links" anvil:name="n_links"><i class="ic ic-link"></i>Link health</a>
           <a href="#tools/ai" anvil:name="n_ai"><i class="ic ic-wand"></i>AI (your key)</a>
           <a href="#tools/events" anvil:name="n_events"><i class="ic ic-ticket"></i>Events key</a>
           <a href="#tools/home" anvil:name="n_home"><i class="ic ic-pin"></i>Home spot &amp; privacy</a>
@@ -42,7 +43,7 @@
 
           <div anvil:name="s_import" class="tl-sec">
             <div class="fb-panel"><h2>Import</h2><p class="muted">Drop a file. Everything lands in your inbox, sorted; links are read in the background so a big import is quick. Duplicates are merged.</p>
-              <label class="ad-drop tl-drop" anvil:dom-node="drop"><i class="ic ic-upload"></i><b>Drop a file here, or tap to choose</b><span class="muted small">.html bookmarks, OneTab .txt, Pocket .csv, Google Takeout .json / .csv, or any text with links</span><input type="file" hidden accept=".html,.htm,.txt,.csv,.json,.geojson" anvil:dom-node="file"></label>
+              <label class="ad-drop tl-drop" anvil:dom-node="drop"><i class="ic ic-upload"></i><b>Drop a file here, or tap to choose</b><span class="muted small">.html bookmarks, OneTab .txt, Pocket, Raindrop or Instapaper .csv, Google Takeout .json / .csv, or any text with links</span><input type="file" hidden accept=".html,.htm,.txt,.csv,.json,.geojson" anvil:dom-node="file"></label>
               <details class="tl-paste"><summary class="muted small">Or paste links / OneTab text</summary>
                 <anvil-component type="TextArea" name="paste_box" prop:placeholder="https://… one per line, or OneTab's “url | title” lines" prop:height="110"></anvil-component>
                 <anvil-component type="Button" name="parse_button" prop:text="Read the text" prop:role='["btn", "btn-sm"]'></anvil-component>
@@ -61,7 +62,9 @@
             <div class="fb-panel"><h3>Where to find your exports</h3><div class="tl-formats">
               <div><b>Chrome bookmarks</b>Bookmarks manager (Ctrl+Shift+O) → ⋮ → Export bookmarks. Folders become tags.</div>
               <div><b>OneTab</b>OneTab → Export / Import URLs → copy the text.</div>
-              <div><b>Pocket</b>Your Pocket export CSV (title, url, tags).</div>
+              <div><b>Pocket</b>The CSV in the export zip you downloaded before Pocket closed. Saved dates, tags and archived items come along. <a href="#moving">Moving from Pocket</a></div>
+              <div><b>Raindrop.io</b>Settings → Backups (or Export) → CSV. Folders become tags; excerpts and favourites come along.</div>
+              <div><b>Instapaper</b>Settings → Export → CSV. Folders become tags; archived items stay archived.</div>
               <div><b>Google Maps</b>takeout.google.com → “Maps (your places)” or “Saved” → Saved Places.json or a list's .csv.</div>
               <div><b>Safari / Firefox</b>File → Export bookmarks (HTML).</div><div><b>Anything else</b>A text or CSV file with links in it.</div></div></div>
           </div>
@@ -75,6 +78,28 @@
                 <anvil-component type="Button" name="exp_html" prop:text="Bookmarks (HTML)" prop:role='["btn", "ic-download"]'></anvil-component>
               </div>
               <p class="muted small">GeoJSON opens in Google My Maps, QGIS or uMap. The bookmarks file imports into any browser, with a folder per category.</p></div>
+          </div>
+
+          <div anvil:name="s_links" class="tl-sec">
+            <div class="fb-panel"><h2>Link health</h2><p class="muted">Pages disappear: about a third of the web from ten years ago is gone. Faves Buddy can check your saved links and tell you which ones moved or vanished, while there's still time to find a saved copy. Only the website itself is asked; nothing is sent anywhere else.</p>
+              <div class="lk-stats">
+                <div><anvil-component type="Label" name="lk_ok" prop:role='["tl-big"]'></anvil-component><span class="muted small">working</span></div>
+                <div><anvil-component type="Label" name="lk_moved" prop:role='["tl-big"]'></anvil-component><span class="muted small">moved</span></div>
+                <div><anvil-component type="Label" name="lk_gone" prop:role='["tl-big", "lk-bad"]'></anvil-component><span class="muted small">gone</span></div>
+                <div><anvil-component type="Label" name="lk_unsure" prop:role='["tl-big"]'></anvil-component><span class="muted small">couldn't tell</span></div>
+              </div>
+              <div class="td-bar lk-bar" anvil:name="lk_bar_part"><i anvil:dom-node="lk_bar"></i></div>
+              <div class="ui-row">
+                <anvil-component type="Button" name="lk_check_button" prop:text="Check my links" prop:role='["btn", "btn-primary", "ic-refresh"]'></anvil-component>
+                <anvil-component type="Button" name="lk_stop_button" prop:text="Stop" prop:role='["btn", "btn-ghost"]' prop:visible="false"></anvil-component>
+                <anvil-component type="Label" name="lk_status" prop:role='["fine-print"]'></anvil-component>
+              </div>
+              <p class="muted small">Some websites refuse automatic checks; those count as “couldn't tell”, never as gone. Each link is checked again after a month.</p>
+            </div>
+            <div class="fb-panel" anvil:name="lk_gone_part"><h3>Gone</h3><p class="muted small">“Saved copy” opens the Wayback Machine (web.archive.org), which often kept a copy of the page.</p>
+              <anvil-component type="RepeatingPanel" name="lk_gone_rows" prop:item_template="Faves_Buddy.Items.LinkRow" prop:role='["lk-list"]'></anvil-component></div>
+            <div class="fb-panel" anvil:name="lk_moved_part"><h3>Moved</h3><p class="muted small">These now open a different address. Use the new one so the link keeps working.</p>
+              <anvil-component type="RepeatingPanel" name="lk_moved_rows" prop:item_template="Faves_Buddy.Items.LinkRow" prop:role='["lk-list"]'></anvil-component></div>
           </div>
 
           <div anvil:name="s_ai" class="tl-sec">

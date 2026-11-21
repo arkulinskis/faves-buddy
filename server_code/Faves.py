@@ -12,6 +12,8 @@ from . import AISort
 from . import Classify
 from . import DemoData
 from . import Fetch
+from . import LinkHealth
+from . import Revisit
 from . import Store
 from . import Taxonomy as T
 
@@ -69,6 +71,9 @@ def _filter(rows, f, me):
     for r in rows:
         if status == "all":
             if r["status"] == "archived":
+                continue
+        elif status == "broken":
+            if r["status"] == "archived" or not LinkHealth.is_broken(r):
                 continue
         elif status == "inbox":
             if r["status"] != "inbox" or _snoozed(r, now):
@@ -144,7 +149,8 @@ def faves_home(filters=None):
             "rediscover": Store.fave(rediscover, me, lists=[], slim=True) if rediscover else None,
             "lists": _brief_lists(me), "has_samples": any(r["is_sample"] for r in rows), "count_all": len(rows),
             "faves": [Store.fave(r, me, lists=[], slim=True) for r in listed[:PAGE]], "total": len(listed), "more": len(listed) > PAGE,
-            "tabsets": len(app_tables.tabsets.search(owner=me))}
+            "tabsets": len(app_tables.tabsets.search(owner=me)),
+            "revisit": Revisit.stats_for(rows, now), "broken": len([r for r in rows if r["status"] != "archived" and LinkHealth.is_broken(r)])}
 
 
 def _brief_lists(me):
@@ -555,8 +561,19 @@ def import_items(items, source="import", group_name=None):
         if not (f.get("url") or f.get("lat") is not None or f.get("title")):
             continue
         f["status"] = "kept" if it.get("category") else "inbox"
+        if it.get("status") == "archived":
+            f["status"] = "archived"  # Pocket / Instapaper / Raindrop items you had already archived there
         if it.get("added"):
-            pass
+            f["created"] = it.get("added")  # keeps when it was first saved (Store ignores dates in the future)
+        meta = {}
+        if it.get("desc"):
+            meta["description"] = C.text(it.get("desc"), 600)
+        if it.get("selection"):
+            meta["selection"] = C.text(it.get("selection"), 600)
+        if meta:
+            f["meta"] = meta
+        if it.get("loved"):
+            f["stage"] = "loved"
         row, created = Store.create(me, f, source=C.text(source, 20) or "import", tabset=ts, model=model)
         added += created
         again += not created

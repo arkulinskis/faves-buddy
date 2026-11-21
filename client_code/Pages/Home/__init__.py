@@ -65,6 +65,14 @@ class Home(HomeTemplate):
         self.inbox_nudge.visible = bool(d["inbox"])
         self.dom_nodes["inbox_n"].textContent = str(d["inbox"])
         self.dom_nodes["inbox_text"].textContent = ("thing is" if d["inbox"] == 1 else "things are") + " waiting in your inbox"
+        rv = d.get("revisit") or {}
+        self.revisit_nudge.visible = bool(rv.get("waiting")) and not d["inbox"]
+        self.dom_nodes["revisit_n"].textContent = str(rv.get("waiting") or 0)
+        self.dom_nodes["revisit_text"].textContent = ("save you kept but never opened" if rv.get("waiting") == 1 else "saves you kept but never opened")
+        self.dom_nodes["revisit_sub"].textContent = "You opened %d of %d. Still want them? A two-minute look, one card at a time." % (
+            rv.get("opened") or 0, rv.get("total") or 0)
+        broken = d.get("broken") or 0
+        self.status_box.items = STATUSES + ([("Broken links (%d)" % broken, "broken")] if broken or self.f.get("status") == "broken" else [])
         empty = not d["count_all"]
         self.welcome.visible, self.collection.visible = empty, not empty
         if empty:

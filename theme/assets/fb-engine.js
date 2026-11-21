@@ -213,16 +213,35 @@
     if (cell || row.length) { row.push(cell); rows.push(row); }
     return rows.filter(function (r) { return r.some(function (c) { return c.trim(); }); });
   };
+  /* A date from an export: unix seconds (Pocket time_added, Instapaper Timestamp), milliseconds or ISO (Raindrop created). */
+  P.when = function (v) {
+    v = (v || '').trim(); if (!v) return null;
+    var d = /^\d{9,13}$/.test(v) ? new Date(+v * (v.length > 11 ? 1 : 1000)) : new Date(v);
+    return isNaN(d.getTime()) ? null : d.toISOString();
+  };
+  /* Folders that are only a reading status in Instapaper / Raindrop, not a topic worth a tag. */
+  var STATUS_FOLDERS = /^(unread|archive|archived|starred|liked|unsorted|read later|home)$/i;
   P.csv = function (text) {
     var rows = P.csvRows(text); if (rows.length < 2) return [];
-    var h = rows[0].map(function (x) { return x.trim().toLowerCase(); }), col = function (n) { return h.indexOf(n); };
-    var iu = col('url'), it = col('title'), itags = col('tags'), inote = col('note'), icom = col('comment'), ilat = col('lat'), ilng = col('lng');
+    var h = rows[0].map(function (x) { return x.trim().toLowerCase(); }), col = function () { for (var i = 0; i < arguments.length; i++) { var k = h.indexOf(arguments[i]); if (k >= 0) return k; } return -1; };
+    var iu = col('url', 'link'), it = col('title', 'name'), itags = col('tags'), inote = col('note'), icom = col('comment'), ilat = col('lat'), ilng = col('lng');
+    var iwhen = col('time_added', 'created', 'timestamp', 'date added', 'added'), istat = col('status'), ifold = col('folder'),
+        iex = col('excerpt', 'description'), isel = col('selection'), ihl = col('highlights'), ifav = col('favorite', 'starred');
     if (iu < 0 && it < 0) return [];
     return rows.slice(1).map(function (r) {
-      var o = { url: iu >= 0 ? (r[iu] || '').trim() : '', title: it >= 0 ? (r[it] || '').trim() : '' };
-      if (itags >= 0 && r[itags]) o.tags = r[itags].split(/[|,]/).map(function (t) { return t.trim().toLowerCase(); }).filter(Boolean).slice(0, 5);
-      var note = [inote >= 0 ? r[inote] : '', icom >= 0 ? r[icom] : ''].filter(Boolean).join('\n').trim(); if (note) o.note = note;
+      var get = function (i) { return i >= 0 ? (r[i] || '').trim() : ''; };
+      var o = { url: get(iu), title: get(it) };
+      var tags = itags >= 0 && r[itags] ? r[itags].split(/[|,]/).map(function (t) { return t.trim().toLowerCase(); }).filter(Boolean) : [];
+      var folder = get(ifold);
+      if (folder && !STATUS_FOLDERS.test(folder)) tags.unshift(folder.split('/').pop().trim().toLowerCase().slice(0, 30));
+      if (tags.length) o.tags = tags.filter(function (t, i) { return tags.indexOf(t) === i; }).slice(0, 5);
+      var note = [get(inote), get(icom), get(ihl) ? 'Highlights: ' + get(ihl) : ''].filter(Boolean).join('\n').trim(); if (note) o.note = note;
       if (ilat >= 0 && ilng >= 0 && r[ilat]) { o.lat = +r[ilat]; o.lng = +r[ilng]; }
+      var added = P.when(get(iwhen)); if (added) o.added = added;
+      if (/^archive/i.test(get(istat)) || /^archive/i.test(folder)) o.status = 'archived';
+      if (get(iex)) o.desc = get(iex).slice(0, 600);
+      if (get(isel)) o.selection = get(isel).slice(0, 600);
+      if (/^(true|1|yes)$/i.test(get(ifav)) || /^starred$/i.test(folder)) o.loved = true;
       return o;
     }).filter(function (o) { return o.url || o.title; });
   };
@@ -254,7 +273,12 @@
     }
     if (/\.csv$/.test(low) || /^[^\n]*\b(url|title)\b[^\n]*,/i.test(text.slice(0, 300))) {
       var rows = P.csv(text);
-      if (rows.length) return [/time_added/.test(text.slice(0, 200)) ? 'Pocket export' : /comment/i.test(text.slice(0, 120)) ? 'Google Maps saved list' : 'Spreadsheet (CSV)', rows];
+      if (rows.length) {
+        var head = text.slice(0, 300).split(/\r?\n/)[0].toLowerCase();
+        var kind = /time_added/.test(head) ? 'Pocket export' : /excerpt/.test(head) && /folder/.test(head) ? 'Raindrop.io export'
+          : /selection/.test(head) && /folder/.test(head) ? 'Instapaper export' : /comment/.test(head) ? 'Google Maps saved list' : 'Spreadsheet (CSV)';
+        return [kind, rows];
+      }
     }
     var ot = P.onetab(text);
     if (ot.length) return ['OneTab export', ot];

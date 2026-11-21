@@ -87,6 +87,7 @@ class Fave(FaveTemplate):
         F, mine = self.F, self.mine
         c = fb.cat(F.get("cat"))
         md = F.get("meta") or {}
+        self._draw_link(md.get("link") if mine else None)
         inbox = F.get("status") == "inbox"
         state.set_attr(self.back, "href", "#inbox" if inbox else "#home")
         self.dom_nodes["back_text"].textContent = "Inbox" if inbox else "Your faves"
@@ -304,6 +305,35 @@ class Fave(FaveTemplate):
         from ...Dialogs.Snooze import Snooze
         if alert(Snooze(fave_id=self.F["id"]), buttons=[], role="app-dialog", dismissible=True):
             self._load()
+
+    def _draw_link(self, ln):
+        """Link health banner: the page is gone (Saved copy on the Wayback Machine) or moved (Use new address)."""
+        st = (ln or {}).get("state")
+        self.link_part.visible = st in ("gone", "moved")
+        if st not in ("gone", "moved"):
+            return
+        gone = st == "gone"
+        self.link_part.classes["gone"] = gone
+        self.dom_nodes["link_title"].textContent = "This page seems to be gone" if gone else "This page moved"
+        self.dom_nodes["link_text"].textContent = (
+            "The website answered “not found” when it was checked %s. The Wayback Machine may have a saved copy." % state.ago(ln.get("checked"))
+            if gone else "It now opens " + fb.short_url(ln.get("moved_to") or "") + ".")
+        self.link_copy.visible = gone and bool(self.F.get("url"))
+        if self.F.get("url"):
+            state.set_attr(self.link_copy, "href", "https://web.archive.org/web/" + self.F["url"])
+        self.link_use_button.visible = not gone
+        self.link_works_button.text = "It works" if gone else "Keep the old one"
+
+    @handle("link_use_button", "click")
+    def link_use_button_click(self, **event_args):
+        if state.call("link_fix", self.F["id"], "use_new") is not None:
+            state.toast("Updated to the new address", "ok")
+            self._load()
+
+    @handle("link_works_button", "click")
+    def link_works_button_click(self, **event_args):
+        if state.call("link_fix", self.F["id"], "works") is not None:
+            self.link_part.visible = False
 
     @handle("delete_button", "click")
     def delete_button_click(self, **event_args):

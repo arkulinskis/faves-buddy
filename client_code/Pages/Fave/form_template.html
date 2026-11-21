@@ -21,6 +21,15 @@
             <a class="ui-btn" anvil:name="dir_link" target="_blank" rel="noopener"><i class="ic ic-compass"></i>Directions</a>
             <a class="ui-btn" anvil:name="osm_link" target="_blank" rel="noopener"><i class="ic ic-map"></i>OpenStreetMap</a>
           </div>
+          <div class="fv-link" anvil:name="link_part" role="status">
+            <i class="ic ic-link"></i>
+            <div class="grow"><b anvil:dom-node="link_title"></b><div class="small" anvil:dom-node="link_text"></div></div>
+            <div class="ui-row fv-link-acts">
+              <a class="ui-btn sm" anvil:name="link_copy" target="_blank" rel="noopener"><i class="ic ic-external"></i>Saved copy</a>
+              <anvil-component type="Button" name="link_use_button" prop:text="Use new address" prop:role='["btn", "btn-primary", "btn-sm", "ic-check"]'></anvil-component>
+              <anvil-component type="Button" name="link_works_button" prop:text="It works" prop:role='["btn", "btn-ghost", "btn-sm"]'></anvil-component>
+            </div>
+          </div>
           <anvil-component type="Label" name="desc" prop:role='["fine-print", "fv-desc"]'></anvil-component>
           <anvil-component type="RepeatingPanel" name="facts" prop:item_template="Faves_Buddy.Items.Fact" prop:role='["fv-facts"]'></anvil-component>
 

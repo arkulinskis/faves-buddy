@@ -27,6 +27,8 @@ PAGES = {
     "add": ("user", "Save something"),
     "tabs": ("user", "Tab sets"),
     "tidy": ("user", "Tidy up"),
+    "revisit": ("user", "Revisit"),
+    "moving": (None, "Moving from Pocket, Raindrop or Instapaper"),
     "share": ("user", "Shared with Faves Buddy"),
     "tools": ("user", "Tools"),
     "s": (None, "Shared list"),
@@ -79,6 +81,12 @@ def _form(name):
     if name == "tidy":
         from .Pages.Tidy import Tidy
         return Tidy
+    if name == "revisit":
+        from .Pages.Revisit import Revisit
+        return Revisit
+    if name == "moving":
+        from .Pages.Moving import Moving
+        return Moving
     if name == "share":
         from .Pages.ShareIn import ShareIn
         return ShareIn

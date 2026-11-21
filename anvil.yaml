@@ -653,9 +653,9 @@ native_deps:
     <!-- Prepsto feedback panel: every "Submit feedback" link and button opens it (it is the only feedback channel). No floating button, no cookies, nothing loads until it is opened. Codes: APP_MAKER/prepsto-links.json -->
     <script src="https://prepsto.com/_/theme/widget.js" data-prepsto="vef7qyr" data-button="false" data-label="Submit feedback" async></script>
     <link rel="stylesheet" href="_/theme/icons.css?v=65344ad6d0">
-    <link rel="stylesheet" href="_/theme/app.css?v=8a0d94cfb2">
+    <link rel="stylesheet" href="_/theme/app.css?v=5fe5327ca7">
     <script src="_/theme/app-kit.js?v=09bf12029d"></script>
-    <script src="_/theme/fb-engine.js?v=a5bf53d8e9"></script>
+    <script src="_/theme/fb-engine.js?v=3c49f2af3e"></script>
     <script src="_/theme/fb-map.js?v=30c74f4db6"></script>
     <script src="_/theme/fb-media.js?v=d9a5dba4fa"></script>
 package_name: Faves_Buddy

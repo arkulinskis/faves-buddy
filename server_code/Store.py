@@ -29,7 +29,8 @@ STAGES = ("", "want", "been", "loved")
 MAX_PHOTO = 3 * 1024 * 1024
 META_KEYS = ("description", "image", "site_name", "og_type", "schema", "lang", "read_min", "address", "startDate", "endDate",
              "priceRange", "servesCuisine", "recipeYield", "totalTime", "entity", "ocr", "ai", "found", "exif", "final_url",
-             "fetch_error", "selection", "favicon", "tags_edited", "fetched", "osm_ref", "suggested_by", "country", "wiki", "ai_sort")
+             "fetch_error", "selection", "favicon", "tags_edited", "fetched", "osm_ref", "suggested_by", "country", "wiki", "ai_sort",
+             "link", "revisited")
 
 
 def token(n=24):
@@ -141,6 +142,14 @@ def parse_when(v):
         return None
 
 
+def _past(v):
+    """A date an import brought along (Pocket's time_added...), if it is a real date in the past; else None."""
+    when = parse_when(v)
+    if when is None or when > C.now() or when.year < 1995:
+        return None
+    return when
+
+
 def clean_meta(meta):
     out = {}
     for k, v in (meta or {}).items():
@@ -202,6 +211,7 @@ def create(owner, f, source="app", tabset=None, model=None, enrich_now=False):
         return same, False
 
     status = f.get("status") if f.get("status") in STATUSES else "inbox"
+    created = _past(f.get("created"))
     if f.get("enriched"):
         meta["fetched"] = True  # the browser or the extension already read the page
     needs = bool(url and not meta.get("fetched")) or (kind == "place" and lat is not None and not osm)
@@ -212,7 +222,7 @@ def create(owner, f, source="app", tabset=None, model=None, enrich_now=False):
         stage=f.get("stage") if f.get("stage") in STAGES else "", rating=None, lat=lat, lng=lng, address=C.text(f.get("address"), 200) or None,
         osm=osm, meta=meta, photo=None, photo_key=None, tabset=tabset, source=C.text(source, 20), saves=1,
         enriched=not needs, remind_at=None, event_at=parse_when(f.get("event_at") or meta.get("startDate")),
-        opened_at=None, created=C.now(), updated=C.now(), is_demo=bool(f.get("is_demo")), is_sample=bool(f.get("is_sample")))
+        opened_at=None, created=created or C.now(), updated=C.now(), is_demo=bool(f.get("is_demo")), is_sample=bool(f.get("is_sample")))
     if f.get("tags"):
         row["meta"] = dict(row["meta"] or {}, tags_edited=True)
     if enrich_now and needs:
@@ -366,6 +376,7 @@ def fave(row, me=None, lists=None, slim=False):
          "photo": bool(row["photo_key"]), "event_at": C.iso(row["event_at"]), "created": C.iso(row["created"]),
          "saves": row["saves"] or 1, "mine": mine, "sample": bool(row["is_sample"]), "demo": bool(row["is_demo"]),
          "desc": (m.get("description") or "")[:240], "read_min": m.get("read_min") or 0, "enriched": bool(row["enriched"]),
+         "link_state": (m.get("link") or {}).get("state") if isinstance(m.get("link"), dict) else None,
          "osm": {k: v for k, v in (row["osm"] or {}).items() if k in OSM_SHOW}}
     if not mine:
         d["owner"] = C.name_of(row["owner"])
@@ -378,7 +389,7 @@ def fave(row, me=None, lists=None, slim=False):
               "tabset_name": row["tabset"]["name"] if row["tabset"] is not None else None,
               "meta": {k: m.get(k) for k in ("site_name", "og_type", "schema", "lang", "startDate", "endDate", "priceRange",
                                               "servesCuisine", "recipeYield", "totalTime", "entity", "ocr", "ai", "found", "exif",
-                                              "fetch_error", "selection", "ai_sort") if m.get(k)}})
+                                              "fetch_error", "selection", "ai_sort", "link") if m.get(k)}})
     if lists is not None:
         d["lists"] = lists
     elif me is not None:

@@ -1,0 +1,69 @@
+<anvil-form layout="Faves_Buddy.Layouts.Shell">
+  <anvil-block slot="content">
+    <div class="ui-wrap td-wrap rv-wrap">
+      <div class="ui-page-head"><div><h1>Revisit</h1><p class="muted">The things you kept but never opened. Still want them? One card at a time, a few minutes, no guilt: letting go is a fine answer.</p></div></div>
+
+      <div class="fb-panel rv-meter" anvil:name="meter_part">
+        <div class="rv-meter-top"><b anvil:dom-node="meter_text"></b><span class="muted small" anvil:dom-node="meter_sub"></span></div>
+        <div class="td-bar" role="img" anvil:dom-node="meter_wrap"><i anvil:dom-node="meter_bar"></i></div>
+      </div>
+
+      <div anvil:name="otd_part">
+        <div class="fb-section"><h2>On this day</h2><span class="muted small">What you saved on this date before</span></div>
+        <anvil-component type="RepeatingPanel" name="otd_panel" prop:item_template="Faves_Buddy.Items.FaveCard" prop:role='["hm-row"]'></anvil-component>
+      </div>
+
+      <div class="rv-filters" anvil:name="filters_part">
+        <div class="rv-filter-row">
+          <div role="group" aria-label="Time you have"><anvil-component type="RepeatingPanel" name="time_chips" prop:item_template="Faves_Buddy.Items.Chip" prop:role='["fb-chips", "scroll"]'></anvil-component></div>
+          <div class="ui-seg" role="group" aria-label="Order">
+            <button type="button" anvil:name="order_old" data-order="old" anvil:on-dom:click="self.order_click">Oldest</button>
+            <button type="button" anvil:name="order_new" data-order="new" anvil:on-dom:click="self.order_click">Newest</button>
+          </div>
+        </div>
+        <div role="group" aria-label="Categories"><anvil-component type="RepeatingPanel" name="cat_chips" prop:item_template="Faves_Buddy.Items.Chip" prop:role='["fb-chips", "scroll"]'></anvil-component></div>
+      </div>
+
+      <div anvil:name="deck_part">
+        <div class="td-top"><anvil-component type="Label" name="count_label" prop:role='["strong", "inline"]'></anvil-component><anvil-component type="Label" name="tally_label" prop:role='["fine-print", "inline"]'></anvil-component></div>
+        <div class="td-stage">
+          <div class="td-card" anvil:dom-node="card">
+            <span class="td-stamp keep">KEEP</span><span class="td-stamp skip">LET GO</span>
+            <anvil-component type="Faves_Buddy.Components.Cover" name="card_cover"></anvil-component>
+            <h2 anvil:dom-node="card_title"></h2>
+            <div class="fb-sub"><i class="ic ic-globe"></i><span anvil:dom-node="card_site"></span></div>
+            <p class="td-desc" anvil:name="card_desc" anvil:dom-node="card_desc_t"></p>
+            <p class="rv-age"><i class="ic ic-clock"></i><span anvil:dom-node="card_age"></span></p>
+          </div>
+          <div class="td-acts rv-acts">
+            <anvil-component type="Button" name="letgo_button" prop:text="Let go" prop:tooltip="Let go: archive it (←)" prop:role='["btn", "ic-archive", "td-skip"]'></anvil-component>
+            <anvil-component type="Button" name="remind_button" prop:text="Remind me" prop:tooltip="Remind me later (↓)" prop:role='["btn", "ic-snooze"]'></anvil-component>
+            <anvil-component type="Button" name="keep_button" prop:text="Still want it" prop:tooltip="Still want it (→)" prop:role='["btn", "btn-primary", "ic-heart", "td-keep"]'></anvil-component>
+          </div>
+          <div class="td-under">
+            <anvil-component type="Button" name="undo_button" prop:text="Undo" prop:role='["btn", "btn-ghost", "btn-sm", "ic-back"]'></anvil-component>
+            <a class="ui-btn primary sm" anvil:name="open_link" target="_blank" rel="noopener" anvil:on-dom:click="self.open_click"><i class="ic ic-external"></i><span anvil:dom-node="open_text">Open it now</span></a>
+            <a class="ui-btn ghost sm" anvil:name="fave_link" href="#home"><i class="ic ic-info"></i>Details</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="ui-empty" anvil:name="empty_part"><i class="ic ic-sparkle"></i><h3 anvil:dom-node="empty_title">Nothing to revisit</h3><p anvil:dom-node="empty_text"></p>
+        <div class="ui-row td-center"><a class="ui-btn" href="#home"><i class="ic ic-heart"></i>Your faves</a><a class="ui-btn ghost" href="#tidy">Tidy up</a></div></div>
+
+      <div anvil:name="done_part">
+        <div class="fb-panel td-done">
+          <div class="big">🌿</div>
+          <anvil-component type="Label" name="done_title" prop:role='["sec-title"]'></anvil-component>
+          <anvil-component type="Label" name="done_text" prop:role='["fine-print"]'></anvil-component>
+          <anvil-component type="RepeatingPanel" name="done_tally" prop:item_template="Faves_Buddy.Items.Chip" prop:role='["td-tally"]'></anvil-component>
+          <div class="ui-row td-center">
+            <anvil-component type="Button" name="more_button" prop:text="Revisit more" prop:role='["btn", "btn-primary", "ic-refresh"]'></anvil-component>
+            <a class="ui-btn" href="#home"><i class="ic ic-heart"></i>Your faves</a>
+            <a class="ui-btn ghost" href="#tools/links"><i class="ic ic-link"></i>Check my links</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </anvil-block>
+</anvil-form>

@@ -77,7 +77,9 @@ theme/assets/
   app.css                 Faves tokens + template base/role layer + the Faves look + every page + the Forms layer (end)
 server_code/              Taxonomy, Classify, Fetch, Store, Faves, Lists, Social (share_fave, shared_fave [public],
                           copy_shared_fave, top_faves, save_top_fave), Clip (extension), Tidy (drops, share target,
-                          manifest), Discover (taste), AISort (in progress), DemoData, Admin, Accounts, Feedback, common
+                          manifest), Discover (taste), AISort (in progress), DemoData, Admin, Accounts, Feedback, common,
+                          Revisit (revisit_queue, revisit_decide, stats_for, on_this_day), LinkHealth (check_links,
+                          link_report, link_fix; Fetch.status = the swappable status check)
 ```
 
 **Tables** (all `client: none`): users, app_settings, feedback, faves (… + `share_token` since Nov 4 2026), tabsets,
@@ -107,6 +109,14 @@ lists, list_items, members, prefs (settings: drops, shots_seen, ai_sort, `top_fa
 - **Restyle:** app.css (tokens at the top, "Faves Buddy look", pages, then the Forms layer at the end), `tools/assets.py`.
 
 ## Gotchas
+
+- **Revisit + Link health keep their state in `faves.meta`** (no columns): `meta.revisited` (ISO, "still want it" stamp,
+  60 days) and `meta.link` = {state ok|moved|gone|unsure, code, moved_to, checked}. Both are in Store.META_KEYS, or
+  clean_meta (enrich, OCR saves) would drop them. Link checks: only 404/410/DNS failure/deep link -> home page count as
+  gone; 403/429/5xx/timeouts are "unsure". Samples and demo faves are never checked. "Saved copy" is a plain
+  web.archive.org link the person opens (nothing is sent to archive.org by the app, so no legal-kit change).
+- Imports keep `added` (Store.create's `created`, past dates only) and `status: archived` from Pocket/Instapaper/Raindrop;
+  the CSV parser is P.csv in fb-engine.js (folders that are only a reading status, like Unread/Archive, don't become tags).
 
 - Grids that hold a scrolling chip row need `grid-template-columns: minmax(0, 1fr)` or the page scrolls sideways on
   phones (Home filters, map filters, tidy cards).

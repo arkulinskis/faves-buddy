@@ -12,6 +12,7 @@ import ipaddress
 import json
 import re
 import socket
+import urllib.error
 import urllib.parse
 import urllib.request
 
@@ -66,6 +67,36 @@ def _real_http(url, data=None, headers=None):
 
 
 http = _real_http  # tests replace this
+
+
+def _real_status(url):
+    """Is this link still there? -> (status code or None, final url, problem or None). Reads only the first bytes.
+    problem: "dns" (the website doesn't exist any more), "blocked" (not a public address), "timeout", "error"."""
+    try:
+        _safe(url)
+    except FetchError as e:
+        return None, url, "dns" if "couldn't be found" in str(e) else "blocked"
+    req = urllib.request.Request(url, headers={"User-Agent": UA, "Accept": "text/html,application/xhtml+xml,*/*;q=0.5",
+                                               "Accept-Language": "en-CA,en;q=0.9"})
+    opener = urllib.request.build_opener(_NoRedirectToPrivate())
+    try:
+        with opener.open(req, timeout=6) as r:
+            r.read(2048)
+            return getattr(r, "status", None) or r.getcode(), r.geturl(), None
+    except urllib.error.HTTPError as e:
+        return e.code, getattr(e, "url", None) or url, None
+    except FetchError:
+        return None, url, "blocked"
+    except Exception as e:
+        reason = getattr(e, "reason", None)
+        if isinstance(reason, socket.gaierror) or isinstance(e, socket.gaierror):
+            return None, url, "dns"
+        if isinstance(reason, socket.timeout) or isinstance(e, socket.timeout) or "timed out" in str(e).lower():
+            return None, url, "timeout"
+        return None, url, "error"
+
+
+status = _real_status  # tests replace this
 
 
 # ------------------------------------------------------------------------------------------- URLs

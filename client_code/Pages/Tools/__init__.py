@@ -8,14 +8,14 @@ from anvil.js import window
 from ._anvil_designer import ToolsTemplate
 from ... import fb, router, state
 
-SECS = ["extension", "phone", "import", "export", "ai", "events", "home", "learned", "samples"]
+SECS = ["extension", "phone", "import", "export", "links", "ai", "events", "home", "learned", "samples"]
 TM_KEY = "favesbuddy.tm"
 
 
 class Tools(ToolsTemplate):
     """#tools/<section>: the extension (download + connection code), on your phone, import (bookmarks HTML, OneTab,
     Pocket CSV, Google Takeout, a Faves Buddy export, any list of links: parsed in the browser), export (JSON, CSV,
-    GeoJSON, bookmarks HTML), AI key (Anthropic, browser only) + the AI-sorting opt-in, events key (Ticketmaster,
+    GeoJSON, bookmarks HTML), link health (check_links in batches, gone/moved lists), AI key (Anthropic, browser only) + the AI-sorting opt-in, events key (Ticketmaster,
     browser only), home spot + Top faves privacy, what the sorter learned, sample faves.
     Server: clip_info, rotate_clip_token, import_items, export_all, set_prefs, learned, forget_learned, load/remove_samples."""
 
@@ -38,6 +38,9 @@ class Tools(ToolsTemplate):
         self.domains.add_event_handler("x-forget", self._forget)
         self.words.add_event_handler("x-forget", self._forget)
         self.home_results.add_event_handler("x-chip", self._home_pick)
+        self.lk_gone_rows.add_event_handler("x-fixed", self._link_fixed)
+        self.lk_moved_rows.add_event_handler("x-fixed", self._link_fixed)
+        self.lk_running = False
         fb.boot()
         getattr(self, "_draw_" + self.sec)()
 
@@ -131,13 +134,89 @@ class Tools(ToolsTemplate):
             self.import_button.text = "Try again"
             state.toast(str(e), "error")
             return
-        state.toast("%s imported%s. They're in your inbox." % (state.plural(added, "new fave"), (", %d already saved" % again) if again else ""), "ok")
+        archived = len([i for i in self.pending if i.get("status") == "archived"])
+        state.toast("%s imported%s. They're in your inbox%s." % (state.plural(added, "new fave"), (", %d already saved" % again) if again else "",
+                                                               (" (%d you had archived are in Archived)" % archived) if archived else ""), "ok")
         self.pending = []
         router.go("inbox")
 
     # ---- export
     def _draw_export(self):
         pass
+
+    # ---- link health
+    def _draw_links(self):
+        self.lk_bar_part.visible = False
+        r = state.call("link_report")
+        if r is None:
+            return
+        self._link_counts(r["counts"])
+        self.lk_gone_rows.items = r["gone"]
+        self.lk_moved_rows.items = r["moved"]
+        self.lk_gone_part.visible = bool(r["gone"])
+        self.lk_moved_part.visible = bool(r["moved"])
+
+    def _link_counts(self, c):
+        self.lk_ok.text = str(c.get("ok") or 0)
+        self.lk_moved.text = str(c.get("moved") or 0)
+        self.lk_gone.text = str(c.get("gone") or 0)
+        self.lk_unsure.text = str(c.get("unsure") or 0)
+        total, due = c.get("total") or 0, c.get("due") or 0
+        if not total:
+            self.lk_status.text = "No web links saved yet."
+            self.lk_check_button.enabled = False
+        elif due:
+            self.lk_status.text = "%s to check" % state.plural(due, "link")
+            self.lk_check_button.enabled = True
+        else:
+            self.lk_status.text = "All %s checked in the last month." % state.plural(total, "link")
+            self.lk_check_button.text = "Check again later"
+            self.lk_check_button.enabled = False
+        self.lk_total = total
+
+    @handle("lk_check_button", "click")
+    def lk_check_button_click(self, **event_args):
+        self.lk_running = True
+        self.lk_check_button.enabled = False
+        self.lk_stop_button.visible = True
+        self.lk_bar_part.visible = True
+        start_due = None
+        checked = 0
+        found = {"gone": 0, "moved": 0}
+        try:
+            while self.lk_running:
+                r = anvil.server.call_s("check_links")
+                if not r.get("ok"):
+                    state.toast(r.get("error") or "Checking stopped.", "error")
+                    break
+                c = r["counts"]
+                checked += r["checked"]
+                for k in found:
+                    found[k] += (r.get("found") or {}).get(k, 0)
+                if start_due is None:
+                    start_due = (c.get("due") or 0) + r["checked"]
+                left = c.get("due") or 0
+                self.dom_nodes["lk_bar"].style.width = "%d%%" % int(round((start_due - left) * 100.0 / max(1, start_due)))
+                self.lk_status.text = "Checked %d of %d…" % (start_due - left, start_due)
+                if not r["checked"] or not left:
+                    break
+        except Exception as e:
+            state.toast(str(e), "error")
+        self.lk_running = False
+        self.lk_stop_button.visible = False
+        if checked:
+            state.toast("Checked %s: %d gone, %d moved." % (state.plural(checked, "link"), found["gone"], found["moved"]), "ok")
+        self._draw_links()
+
+    @handle("lk_stop_button", "click")
+    def lk_stop_button_click(self, **event_args):
+        self.lk_running = False
+        self.lk_stop_button.visible = False
+
+    def _link_fixed(self, fave_id, link_state=None, **event_args):
+        r = anvil.server.call_s("link_report")
+        if r and r.get("ok"):
+            self._link_counts(r["counts"])
 
     def _export(self, kind, button):
         button.enabled = False

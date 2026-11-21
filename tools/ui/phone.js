@@ -25,7 +25,7 @@
     log.push((w > vw + 1 ? 'WIDE ' : 'ok   ') + hash + ' (' + w + ')');
   }
   try {
-    for (const h of ['#landing', '#auth', '#auth/signup', '#app']) await check(h);
+    for (const h of ['#landing', '#auth', '#auth/signup', '#app', '#moving']) await check(h);
     // sign up so the member pages can be checked too
     location.hash = '#auth/signup';
     await until(() => window.UI_READY && $$('.au-card input').length >= 3, 'sign-up form');
@@ -40,7 +40,7 @@
     await until(() => window.UI_READY && $$('.fb-card').length > 3, 'samples loaded', 60000);
     for (const h of ['#home', '#inbox', '#map', '#discover', '#discover/top', '#discover/events', '#discover/ideas', '#lists', '#add', '#add/place', '#add/photo',
                      '#add/note', '#tabs', '#tidy', '#tidy/tabs', '#tidy/shots', '#tools', '#tools/phone', '#tools/import', '#tools/export', '#tools/ai', '#tools/events',
-                     '#tools/home', '#tools/learned', '#tools/samples', '#app', '#profile']) await check(h);
+                     '#tools/home', '#tools/learned', '#tools/samples', '#app', '#profile', '#revisit', '#tools/links']) await check(h);
     const fave = $$('.fb-card a.fb-card-link').map((a) => a.getAttribute('href')).find((h) => /^#fave\//.test(h || ''));
     if (fave) await check(fave);
     const lst = await (async () => { await check('#lists'); return $$('a.ls-tile').map((a) => a.getAttribute('href')).find((h) => /^#list\//.test(h || '')); })();
